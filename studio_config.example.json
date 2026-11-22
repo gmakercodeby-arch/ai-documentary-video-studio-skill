@@ -1,0 +1,13 @@
+{
+  "channel_badge": "GMZ",
+  "language": "hi",
+  "tts_model": "gemini-3.1-flash-tts-preview",
+  "tts_voice": "Fenrir",
+  "target_wpm": 162,
+  "outro_cta_enabled": true,
+  "outro_cta_text": "और हाँ, अगर आप भी ऐसा ही सिनेमैटिक वीडियो सिर्फ एक क्लिक में बनवाना चाहते हैं, तो नीचे डिस्क्रिप्शन में दी गई वेबसाइट पर ज़रूर विज़िट करें!",
+  "outro_cta_website_label": "VISIT WEBSITE IN DESCRIPTION",
+  "min_unique_assets": 55,
+  "max_asset_reuse": 4,
+  "repeat_cooldown_shots": 12
+}

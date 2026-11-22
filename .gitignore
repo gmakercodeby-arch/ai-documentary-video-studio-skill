@@ -1,0 +1,29 @@
+# Secrets & local config
+.env
+.env.*
+!.env.example
+studio_config.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated media & caches
+*.mp4
+*.mkv
+*.mp3
+*.wav
+*.jpg
+*.jpeg
+*.png
+_tmp_clips*/
+qa_proxies/
+qa_preflight/
+output/
+chunks/
+
+# OS
+.DS_Store
+Thumbs.db
