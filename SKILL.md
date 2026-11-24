@@ -81,16 +81,23 @@ If `.env` or `studio_config.json` is missing (or any required dependency is abse
 
 ---
 
-## 4. Stage 3 — v5.0 "1M-View Cinema" Visual Engine (Multi-Beat Veo + Zero Static Slides!)
+## 4. Stage 3 — v5.1 "1M-View Cinema" Visual Engine (`Omni 1.2 Flash` `3s–15s` + Zero Static Slides!)
 
-### Step 3A — Multi-Beat Timeline Veo 3.1 Director Prompting (MANDATORY for Every 8s Clip!)
-NEVER write a single-action 8-second prompt! Choreograph **3 distinct story beats inside `[0-2.5s] -> [2.5-5.5s] -> [5.5-8.0s]`** with camera motion, lens/lighting, and synced diegetic Foley SFX:
+### Step 3A — Variable-Length (`3s–15s`) & Multi-Beat Director Prompting (MANDATORY!)
+Match clip duration to the story beat (`Omni 1.2 Flash` ~3 credits/sec, `count=1`):
+- **`3s–5s` (`9–15 credits`):** Quick single-beat metaphors & reactions (*1 plate paneer, ATM balance zero, rubber stamp thud, shock reaction*) — saves 40–60% credits!
+- **`8s` (`24 credits`):** Standard **3-Beat Mini-Movie** (`[0-2.5s] Setup -> [2.5-5.5s] Camera Move/Action Peak -> [5.5-8.0s] Hero Payoff`).
+- **`12s–15s` (`36–45 credits`):** Full **5-Beat Continuous Hero Sequence** (Act 1 cold-open hook, full 3D cutaway journey, or gamified lock reveal).
 ```text
 [0-2.5s] Wide/tracking establishing action with clear subject & environment.
 [2.5-5.5s] Snap close-up / dynamic camera push-in / mechanism reveal.
 [5.5-8.0s] Dramatic hero payoff / reaction / macro detail reveal.
 Cinematography: 35mm anamorphic documentary lens, dramatic rim lighting, authentic Foley SFX (specific mechanical/water/wind sounds), NO text, NO spoken dialogue.
 ```
+**Zero-Skip Failure & Retry Protocol (NEVER Silently Skip a Failed Clip!):**
+1. **Retry #1 (Cooldown + `flow_retry` / fresh queue):** Pause 20–30s on `PUBLIC_ERROR_UNUSUAL_ACTIVITY` or timeout and retry cleanly (ensure no duplicate browser tab is open on the same project).
+2. **Retry #2 (Prompt / Model Rescue):** Simplify safety-trigger words, switch between `Omni 1.2 Flash` and `veo-3.1-fast`, or step duration down (`15s -> 8s`) and regenerate.
+3. **Controlled Fallback (ONLY after 2 failed retries or 0 credits):** Replace immediately with a dedicated custom 3D `nano-banana-2` cutaway (60fps Ken Burns + procedural SFX) so zero story beats are ever dropped.
 
 ### Step 3B — Sentence-by-Sentence Visual Noun & Metaphor Audit (`visual_noun_map.json`)
 Read EVERY sentence of `acts.json` BEFORE generating/sourcing visuals and list EVERY concrete object, technology, AND everyday analogy (*ATM machine, blocked heart artery, NASA satellite, computer 3D CAD map*) — every concept gets its OWN dedicated visual pinned to the exact Whisper timestamp!
