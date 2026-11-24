@@ -81,26 +81,30 @@ If `.env` or `studio_config.json` is missing (or any required dependency is abse
 
 ---
 
-## 4. Stage 3 — v4.0 Literal Word-to-Object Visual Engine
+## 4. Stage 3 — v5.0 "1M-View Cinema" Visual Engine (Multi-Beat Veo + Zero Static Slides!)
 
-### Step 3A — Mandatory Sentence-by-Sentence Visual Noun Audit (`visual_noun_map.json`)
-Read EVERY sentence of `acts.json` BEFORE generating/sourcing visuals and list EVERY concrete object, technology, place, or visual concept mentioned:
-- If the script says *"NASA satellites monitor it from orbit"* → **A NASA satellite orbiting Earth MUST appear at that exact Whisper timestamp!**
-- If the script says *"engineers built a 3D computer map"* → **A computer screen showing a 3D CAD/digital map MUST appear at that exact timestamp!**
-- **NEVER cover a specifically named object with an unrelated generic wide shot!**
+### Step 3A — Multi-Beat Timeline Veo 3.1 Director Prompting (MANDATORY for Every 8s Clip!)
+NEVER write a single-action 8-second prompt! Choreograph **3 distinct story beats inside `[0-2.5s] -> [2.5-5.5s] -> [5.5-8.0s]`** with camera motion, lens/lighting, and synced diegetic Foley SFX:
+```text
+[0-2.5s] Wide/tracking establishing action with clear subject & environment.
+[2.5-5.5s] Snap close-up / dynamic camera push-in / mechanism reveal.
+[5.5-8.0s] Dramatic hero payoff / reaction / macro detail reveal.
+Cinematography: 35mm anamorphic documentary lens, dramatic rim lighting, authentic Foley SFX (specific mechanical/water/wind sounds), NO text, NO spoken dialogue.
+```
 
-### Step 3B — High-Diversity Visual Library (`60–85+` UNIQUE Verified Assets)
-1. **15–20 UNIQUE AI Action Clips** (e.g., Google Flow `Veo 3.1 Fast` via `google-flow` MCP):
-   - **Strict Rate-Limit Rule:** Queue **1 job at a time** + wait for completion (prevents anti-abuse throttling).
-   - Default `crop_zoom: 1.14` (`1.20–1.28` if edge borders or corner artifacts appear).
-   - Keep natural ambient SFX at `-16 dB`, but set `"keep_native_sfx": false` on any clip where AI accidentally generates speech/gibberish!
-2. **25–35 UNIQUE 3D Cutaways & Literal Object Scenes** (`Nano-Banana-2` / `scripts/generate_cutaway_image.py`):
-   - Generate crisp, text-free 16:9 visuals for every specific object, blueprint, satellite, cutaway, and visual metaphor.
-   - `assemble_documentary.py` automatically pre-crops `12%` (`crop=iw*0.88:ih*0.88:0:0`) on `3d_images/` to remove corner AI star watermarks and animates with silky `2560x1440` supersampled 60fps Ken Burns!
-3. **25–35 Visually Audited Real Archival / Engineering / NASA Photos:**
-   - Visually inspect a numbered contact sheet BEFORE adding photos to `verified_assets/real_photos/` — reject low-res, vertical, watermarked, or off-topic photos.
-4. **10–18 Playwright Glassmorphism Callout Cards:**
-   - Render transparent `1920x1080` PNG lower-thirds with HTML/CSS glassmorphism synced dynamically to exact Whisper timestamps.
+### Step 3B — Sentence-by-Sentence Visual Noun & Metaphor Audit (`visual_noun_map.json`)
+Read EVERY sentence of `acts.json` BEFORE generating/sourcing visuals and list EVERY concrete object, technology, AND everyday analogy (*ATM machine, blocked heart artery, NASA satellite, computer 3D CAD map*) — every concept gets its OWN dedicated visual pinned to the exact Whisper timestamp!
+
+### Step 3C — High-Diversity Asset Quota (`60–85+` UNIQUE Visuals — ZERO Static PowerPoint Slides!)
+1. **15–22 UNIQUE Multi-Beat AI Action Clips** (Google Flow `Veo 3.1 Fast` via `google-flow` MCP):
+   - **Strict Rate-Limit Rule:** Queue **1 job at a time** + wait for completion.
+   - Lock recurring characters (`flow_character` / identical wardrobe description) so the film has movie-grade continuity.
+   - Keep natural diegetic Foley SFX (`-16 dB`), but set `"keep_native_sfx": false` if AI ever generates speech! Crop `1.14x–1.28x`.
+2. **25–35 UNIQUE Photorealistic 3D Cutaways & Visual Metaphors** (`Nano-Banana-2` / `scripts/generate_cutaway_image.py`):
+   - Pre-cropped `12%` (`crop=iw*0.88:ih*0.88:0:0`) on `3d_images/` + silky `2560x1440` 60fps Ken Burns.
+3. **20–30 Visually Audited Real Archival / Engineering / NASA Photos** (audited via contact sheet).
+4. **Kinetic Typography, HUD Pointers & Split-Screen Overlays (`scripts/render_kinetic_overlays.py`):**
+   - **NEVER use full-screen static text/blueprint slides!** Composite **Giant Bold Kinetic Impact Text**, **Thin Glowing HUD Pointer Lines**, **Split-Screen Comparisons**, and the **Gold 1-Click Website Outro CTA** directly over moving footage — paired with procedural cinema SFX (`"sfx": "whoosh" | "bass_hit" | "pop" | "riser"`)!
 
 ---
 

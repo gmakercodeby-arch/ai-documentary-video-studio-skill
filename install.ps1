@@ -1,4 +1,4 @@
-﻿# AI Documentary Video-Making Studio Skill (v4.0) — Windows 1-Click Installer
+# AI Documentary Video-Making Studio Skill (v4.0) — Windows 1-Click Installer
 # Usage: irm https://raw.githubusercontent.com/gmakercodeby-arch/ai-documentary-video-studio-skill/main/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"

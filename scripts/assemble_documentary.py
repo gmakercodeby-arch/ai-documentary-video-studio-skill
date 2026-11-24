@@ -1,14 +1,20 @@
-"""
-AI Documentary Studio v4.0 — Ultra-Fast Pro Cinema 16:9 @ 60fps Assembler
-- Auto-Hardware GPU Encoder Detection: Probes Intel QuickSync (h264_qsv), NVIDIA (h264_nvenc),
-  and Apple VideoToolbox (h264_videotoolbox), with automatic libx264 fallback.
-- Multi-Core Parallel Rendering: ThreadPoolExecutor renders multiple clips simultaneously.
-- Smart SHA-1 Clip Caching: Unchanged clips are reused in 0.0s on polish re-renders.
-- Smart 2560x1440 (1.33x) Ken Burns Supersampling: Ultra-sharp & jitter-free at 1080p60.
-- Clean Crops: Automatic 12% bottom-right watermark crop on 3d_images/ and 1.14x default video border crop.
-- Batched 0.25s Crossfade Transitions: Lossless PCM .mkv intermediates + ±0.15s sync guard.
-- Single True Two-Pass Loudnorm (I=-13:TP=-1.5:LRA=9, linear=true) + BGM ducking + clean 2.5s fade-out.
-- Sleek Playwright Glassmorphism Brand Badge PNG + Auto Layer-2 2-min QA Proxy Generator!
+﻿"""
+GMZ Documentary Studio v3.5 â€” Ultra-Fast Pro Cinema 16:9 @ 60fps Assembler
+Speed & Quality Upgrades (v3.5):
+- Auto-Hardware GPU Encoder Detection: Probes Intel QuickSync (h264_qsv) & NVIDIA (h264_nvenc),
+  using hardware GPU acceleration automatically when available (with automatic libx264 fallback).
+- Multi-Core Parallel Rendering: ThreadPoolExecutor (default 3 workers on 8-core CPU) renders
+  multiple clips simultaneously -> 3x-5x faster overall render!
+- Smart SHA-1 Clip Caching: Hashes every shot's exact visual/audio params; unchanged clips are
+  reused in 0.0s on re-renders!
+- Smart 2560x1440 (1.33x) Ken Burns Supersampling: 2.25x fewer pixels than 4K while remaining
+  razor-sharp & jitter-free at 1080p60.
+- 3D AI Watermark Fix: Pre-crops 12% off bottom-right edges (crop=iw*0.88:ih*0.88:0:0) on 3d_images/.
+- Veo Border Crop Fix: crop_zoom=1.14 default, 1.20 specifically for veo_02_energia_liftoff.mp4.
+- Batched 0.25s Crossfade Transitions: Lossless PCM .mkv intermediates + exact inter-batch handles
+  + Â±0.15s sync guard (ZERO OOM, ZERO AAC priming drift!).
+- Single True Two-Pass Loudnorm (I=-13:TP=-1.5:LRA=9, linear=true) + Clean 2.5s BGM fade-out.
+- Sleek Playwright Glassmorphism GMZ Badge PNG + Auto Layer-2 QA Proxy Chunk Generator!
 """
 
 import argparse
@@ -43,14 +49,15 @@ def has_audio_stream(path: Path) -> bool:
 
 
 def detect_best_encoder() -> tuple[str, list[str], list[str]]:
-    """Detect fastest working GPU hardware encoder with automatic libx264 fallback."""
+    """
+    Detect fastest working GPU hardware encoder (Intel QSV / NVIDIA NVENC) with libx264 fallback.
+    Returns: (encoder_name, clip_enc_args, master_enc_args)
+    """
     candidates = [
-        ("h264_nvenc", ["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "19"],
-                       ["-c:v", "h264_nvenc", "-preset", "p5", "-cq", "18"]),
         ("h264_qsv", ["-c:v", "h264_qsv", "-preset", "faster", "-global_quality", "20", "-look_ahead", "0"],
                      ["-c:v", "h264_qsv", "-preset", "medium", "-global_quality", "19", "-look_ahead", "0"]),
-        ("h264_videotoolbox", ["-c:v", "h264_videotoolbox", "-q:v", "65"],
-                              ["-c:v", "h264_videotoolbox", "-q:v", "72"]),
+        ("h264_nvenc", ["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "19"],
+                       ["-c:v", "h264_nvenc", "-preset", "p5", "-cq", "18"]),
     ]
     for name, clip_args, master_args in candidates:
         res = subprocess.run(
@@ -66,7 +73,7 @@ def detect_best_encoder() -> tuple[str, list[str], list[str]]:
     )
 
 
-def render_brand_badge_png(badge_text: str, out_png: Path) -> Path:
+def render_gmz_badge_png(badge_text: str, out_png: Path) -> Path:
     """Render a sleek translucent dark glassmorphism pill PNG with subtle gold border/glow via Playwright."""
     from playwright.sync_api import sync_playwright
 
@@ -99,10 +106,7 @@ def render_brand_badge_png(badge_text: str, out_png: Path) -> Path:
 <body><div class="pill"><span class="dot"></span><span>{badge_text}</span></div></body></html>"""
 
     with sync_playwright() as p:
-        try:
-            browser = p.chromium.launch(channel="chrome")
-        except Exception:
-            browser = p.chromium.launch()
+        browser = p.chromium.launch(channel="chrome")
         page = browser.new_page(viewport={"width": 240, "height": 96})
         page.set_content(html)
         page.screenshot(path=str(out_png), omit_background=True)
@@ -112,20 +116,36 @@ def render_brand_badge_png(badge_text: str, out_png: Path) -> Path:
 
 def shot_cache_key(shot: dict, render_dur: float, fps: int, width: int, height: int, enc_name: str) -> str:
     payload = {
-        "v": "4.0",
+        "v": "5.0",
         "path": str(Path(shot["path"]).resolve()),
         "mtime": Path(shot["path"]).stat().st_mtime if Path(shot["path"]).exists() else 0,
+        "split_right": str(Path(shot["split_right"]).resolve()) if shot.get("split_right") else "",
         "render_dur": round(render_dur, 4),
         "start": round(float(shot.get("start", 0.0)), 3),
         "motion": shot.get("motion", "zoom_in"),
         "callout": shot.get("callout") or "",
+        "sfx": shot.get("sfx") or "",
         "crop_zoom": shot.get("crop_zoom"),
+        "crop_watermark": bool(shot.get("crop_watermark", False)),
         "fade_in": float(shot.get("fade_in", 0.0)),
         "fade_out": float(shot.get("fade_out", 0.0)),
         "keep_native_sfx": shot.get("keep_native_sfx", True),
         "fps": fps, "w": width, "h": height, "enc": enc_name,
     }
     return hashlib.sha1(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()[:12]
+
+
+def sfx_aeval_expr(sfx_name: str) -> str | None:
+    """Procedural copyright-free cinema SFX (whoosh, bass_hit, pop, riser) for Cinema Documentary punch!"""
+    if sfx_name == "whoosh":
+        return "aevalsrc='0.35*sin(2*PI*(180+700*t)*t)*exp(-4.5*t) + 0.15*sin(2*PI*(90+240*t)*t)*exp(-3.5*t)':s=44100:d=0.45:c=mono,aresample=44100,aformat=channel_layouts=stereo,volume=-8dB"
+    if sfx_name == "bass_hit":
+        return "aevalsrc='0.55*sin(2*PI*(95*exp(-3.2*t)+38)*t)*exp(-3.8*t)':s=44100:d=0.65:c=mono,aresample=44100,aformat=channel_layouts=stereo,volume=-6dB"
+    if sfx_name == "pop":
+        return "aevalsrc='0.40*sin(2*PI*(520*exp(-12*t)+180)*t)*exp(-14*t)':s=44100:d=0.22:c=mono,aresample=44100,aformat=channel_layouts=stereo,volume=-9dB"
+    if sfx_name == "riser":
+        return "aevalsrc='0.28*sin(2*PI*(110+420*t*t)*t)*min(t*1.5,1)':s=44100:d=0.90:c=mono,aresample=44100,aformat=channel_layouts=stereo,volume=-9dB"
+    return None
 
 
 def build_clip(
@@ -153,8 +173,12 @@ def build_clip(
         st_out = max(render_dur - fade_out, 0.0)
         fades += f",fade=t=out:st={st_out:.2f}:d={fade_out:.2f}"
 
+    # Smart 2560x1440 supersampling (1.33x) -> 2.25x faster Ken Burns than 4K, zero jitter at 1080p60!
     ss_w, ss_h = int(width * 4 / 3), int(height * 4 / 3)
     pix_fmt = "nv12" if "h264_qsv" in enc_args else "yuv420p"
+
+    sfx_expr = sfx_aeval_expr(shot.get("sfx", ""))
+    audio_src = sfx_expr if sfx_expr else "anullsrc=r=44100:cl=stereo"
 
     if is_img:
         frames = max(int(round(render_dur * fps)), 1)
@@ -184,21 +208,22 @@ def build_clip(
         if callout:
             cmd = [
                 "ffmpeg", "-y", "-loop", "1", "-i", str(src), "-loop", "1", "-i", str(callout),
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v]",
-                "-map", "[v]", "-map", "2:a", "-t", f"{render_dur:.3f}",
+                "-f", "lavfi", "-i", audio_src,
+                "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v];[2:a]apad=whole_dur={render_dur:.3f}[a]",
+                "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
                 *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
             ]
         else:
             cmd = [
                 "ffmpeg", "-y", "-loop", "1", "-i", str(src),
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                "-t", f"{render_dur:.3f}", "-vf", vf,
+                "-f", "lavfi", "-i", audio_src,
+                "-t", f"{render_dur:.3f}", "-vf", vf, "-af", f"apad=whole_dur={render_dur:.3f}",
                 *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
             ]
     else:
         ss = float(shot.get("start", 0.0))
-        crop_zoom = float(shot.get("crop_zoom", 1.14))
+        default_crop = 1.14
+        crop_zoom = float(shot.get("crop_zoom", default_crop))
         sw, sh = int(width * crop_zoom), int(height * crop_zoom)
         vf = (
             f"scale={sw}:{sh}:force_original_aspect_ratio=increase,"
@@ -245,6 +270,7 @@ def build_clip(
 
     res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if res.returncode != 0 and "h264_qsv" in enc_args:
+        # Automatic transparent fallback to libx264 if QSV rejects a specific clip
         fallback_cmd = [x for x in cmd]
         q_idx = fallback_cmd.index("h264_qsv")
         fallback_cmd[q_idx - 1 : q_idx + 7] = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "18"]
@@ -385,20 +411,20 @@ def make_qa_grid(video_path: Path, out_grid: Path, num_frames: int = 25):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Assemble 16:9 60fps Pro Documentary (v4.0 GPU + Multi-Core + SHA-1 Caching).")
+    ap = argparse.ArgumentParser(description="Assemble 16:9 60fps GMZ Pro Documentary (v3.5 GPU + Multi-Core + Caching).")
     ap.add_argument("--plan", required=True, help="JSON list of shots")
-    ap.add_argument("--narration", required=True, help="Master narration MP3/WAV")
+    ap.add_argument("--narration", required=True, help="Master Hindi narration MP3/WAV")
     ap.add_argument("--bgm", default=None, help="Optional copyright-free BGM MP3/WAV")
     ap.add_argument("--segments", default=None, help="Optional segments.json to trim clean 2.5s ending after last spoken word")
     ap.add_argument("--out", required=True, help="Output final MP4 path")
-    ap.add_argument("--badge", default="GMZ", help="Bottom-right glassmorphism pill badge text (empty string disables)")
+    ap.add_argument("--badge", default="GMZ", help="Bottom-right glassmorphism pill badge text (default: GMZ)")
     ap.add_argument("--badge-png", default=None, help="Optional pre-rendered glassmorphism badge PNG path")
     ap.add_argument("--fps", type=int, default=60)
     ap.add_argument("--width", type=int, default=1920)
     ap.add_argument("--height", type=int, default=1080)
     ap.add_argument("--xfade", type=float, default=XFADE_DUR)
     ap.add_argument("--batch-size", type=int, default=BATCH_SIZE)
-    ap.add_argument("--workers", type=int, default=min(3, max(1, (os.cpu_count() or 4) // 2)), help="Parallel clip workers")
+    ap.add_argument("--workers", type=int, default=min(3, max(1, (os.cpu_count() or 4) // 2)), help="Parallel clip workers (default: 3)")
     ap.add_argument("--no-gpu", action="store_true", help="Force CPU libx264 encoding")
     ap.add_argument("--no-proxy", action="store_true", help="Skip Layer-2 QA proxy generation")
     args = ap.parse_args()
@@ -409,7 +435,7 @@ def main():
         master_enc = ["-c:v", "libx264", "-preset", "medium", "-crf", "18"]
     else:
         enc_name, clip_enc, master_enc = detect_best_encoder()
-    print(f"[ENGINE v4.0] Video Encoder: {enc_name} | Parallel Workers: {args.workers} | Clip Caching: ON")
+    print(f"[ENGINE v3.5] Video Encoder: {enc_name} | Parallel Workers: {args.workers} | Clip Caching: ON")
 
     shots = json.loads(Path(args.plan).read_text(encoding="utf-8"))
     narr_dur = probe_duration(Path(args.narration))
@@ -432,10 +458,11 @@ def main():
 
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_dir = out_path.parent / "_tmp_clips_v40"
+    tmp_dir = out_path.parent / "_tmp_clips_v35"
     cache_dir = tmp_dir / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
 
+    # Prepare tasks with SHA-1 smart clip caching + lossless PCM .mkv clips
     clip_paths: list[Path] = []
     target_durs: list[float] = []
     to_render: list[tuple[int, dict, Path, float]] = []
@@ -469,6 +496,7 @@ def main():
                 if done_count % 10 == 0 or done_count == len(to_render):
                     print(f"  [RENDER {done_count}/{len(to_render)}] Done clip #{idx} ({Path(shot['path']).name})")
 
+    # Batched 0.25s xfade join with lossless PCM intermediates (.mkv) & exact inter-batch handle sync!
     batch_files: list[Path] = []
     batch_durs: list[float] = []
     for b_idx, start_i in enumerate(range(0, len(clip_paths), args.batch_size), 1):
@@ -488,7 +516,7 @@ def main():
     drift = abs(joined_dur - sum(target_durs))
     print(f"[SYNC CHECK] Joined video={joined_dur:.3f}s vs target={sum(target_durs):.3f}s (drift={drift:.3f}s)")
     if drift > 0.15:
-        print(f"  [WARN] Video xfade drift {drift:.3f}s exceeded ±0.15s tolerance!")
+        print(f"  [WARN] Video xfade drift {drift:.3f}s exceeded Â±0.15s tolerance!")
 
     master_audio_wav = tmp_dir / "final_audio_master.wav"
     two_pass_loudnorm_mix(
@@ -499,9 +527,9 @@ def main():
         master_audio_wav,
     )
 
-    badge_png = Path(args.badge_png) if args.badge_png else (out_path.parent / "brand_badge.png")
+    badge_png = Path(args.badge_png) if args.badge_png else (out_path.parent / "gmz_badge.png")
     if args.badge.strip() and not badge_png.exists():
-        render_brand_badge_png(args.badge.strip(), badge_png)
+        render_gmz_badge_png(args.badge.strip(), badge_png)
 
     master_pix = "nv12" if "h264_qsv" in master_enc else "yuv420p"
     if args.badge.strip() and badge_png.exists():
@@ -527,7 +555,7 @@ def main():
             str(out_path),
         ]
 
-    print(f"Rendering final 1080p @ 60fps v4.0 Master ({enc_name}):", out_path)
+    print(f"Rendering final 1080p @ 60fps GMZ v3.5 Master ({enc_name}):", out_path)
     res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if res.returncode != 0 and "h264_qsv" in master_enc:
         fb = [x.replace("format=nv12", "format=yuv420p") for x in cmd]
@@ -543,6 +571,7 @@ def main():
     print(f"DONE! Video: {out_path} ({final_dur:.2f}s | spoken_end={spoken_end:.2f}s + 2.5s fade)")
     print(f"QA Grid saved: {qa_grid}")
 
+    # Auto-build Layer-2 Native Watch & Listen QA Proxy chunks (~5 MB each) for direct read_file audit!
     if not args.no_proxy:
         proxy_script = Path(__file__).parent / "make_qa_proxy.py"
         if proxy_script.exists():
@@ -551,3 +580,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
