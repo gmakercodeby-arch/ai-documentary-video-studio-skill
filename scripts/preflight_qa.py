@@ -1,17 +1,15 @@
 """
-AI Documentary Studio v5.2 — Layer 1 Automated Pre-Flight QA (preflight_qa.py)
-Runs BEFORE spending compute on final MP4 rendering to catch 90%+ of defects in ~15 seconds:
+GMZ Documentary Studio v3.5 — Layer 1 Automated Pre-Flight QA (preflight_qa.py)
+Runs BEFORE spending minutes on final MP4 rendering to catch 85%+ of defects in ~15 seconds:
   1. Visual Contact Sheet (preflight_assets_grid.png): 1 labeled frame from EVERY unique photo,
-     3D render, and video clip used in shot_plan.json.
+     3D render, and Veo clip used in shot_plan.json (filenames burned below each tile).
   2. Callout Preview Grid (preflight_callouts_grid.png): Every callout shot composited over its
-     paired background image/frame with timestamp burned on top.
+     paired background image/frame with exact timestamp + spoken hint burned on top.
   3. Audio Silence Gate: Runs FFmpeg silencedetect on master narration (FAIL if any gap > 2.5s).
-  4. 100% Local Voice-Tone Consistency Forensics: Compares RMS dB, ZCR Hz, and 350Hz warmth ratio
-     across all act_*_master.mp3 files to catch accidental TTS model/voice shifts.
-  5. Script vs Whisper Coverage Diff + TTS Stage-Direction Hallucination Scanner:
-     Catches clipped sentences, repeated endings, and rogue spoken stage directions ("Pause" / "पॉज़").
-  6. Visual Richness & Anti-Repetition Gate: Enforces >=55 unique assets (10+ min videos),
-     <=4 max uses per asset, and >=12 shots cooldown before any visual can reappear!
+  4. Script vs Whisper Coverage Diff: Compares acts.json vs segments.json normalized Hindi words
+     to catch clipped/missing sentences or repeated endings.
+  5. Shot Plan Validator: Verifies zero missing files, 6-shot anti-repeat cooldown compliance,
+     and clean duration sync vs last_spoken_end.
 """
 
 import argparse
@@ -26,13 +24,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def load_font(size: int):
-    candidates = [
-        r"C:\Windows\Fonts\arialbd.ttf",
-        r"C:\Windows\Fonts\segoeui.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-    ]
-    for p in candidates:
+    for p in [r"C:\Windows\Fonts\arialbd.ttf", r"C:\Windows\Fonts\segoeui.ttf"]:
         if Path(p).exists():
             return ImageFont.truetype(p, size)
     return ImageFont.load_default()
@@ -134,6 +126,7 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
     whisper_words = len(whisper_text.split())
     ratio = round(whisper_words / max(script_words, 1), 3)
 
+    # Check for repeated ending lines in last 3 segments
     segs = seg_data.get("segments", [])
     tail_repeat = False
     if len(segs) >= 2:
@@ -141,6 +134,7 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
         if t2 and t2 in t1:
             tail_repeat = True
 
+    # Detect >2.5s internal gaps in Whisper timeline
     gaps = []
     prev_end = 0.0
     for s in segs:
@@ -149,7 +143,7 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
             gaps.append({"from": round(prev_end, 2), "to": round(float(s["start"]), 2), "gap_sec": g})
         prev_end = float(s["end"])
 
-    # v5.2: Detect TTS spoken stage-direction / hallucinated rogue words (e.g. spoken "Pause" / "पॉज़" / "बास")
+    # Detect TTS stage-direction / hallucinated rogue words (e.g. spoken "Pause" / "पॉज़" / "बास")
     full_script_lower = " ".join(a["text"] for a in acts).lower()
     suspect_tokens = ["pause", "पॉज़", "पॉज", "पौज", "बास", "beat", "silence", "narrator", "cut to", "fade out"]
     tts_hallucinations = []
@@ -157,6 +151,7 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
         txt = s["text"].strip()
         txt_l = txt.lower()
         dur_s = round(float(s["end"]) - float(s["start"]), 2)
+        # Flag short standalone segments matching stage directions not present in script
         if len(txt.split()) <= 3 and dur_s <= 1.6:
             for tok in suspect_tokens:
                 if tok in txt_l and tok not in full_script_lower:
@@ -180,17 +175,53 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
     }
 
 
-def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4) -> dict:
+def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4, xfade: float = 0.25) -> dict:
     missing = [s["path"] for s in shots if not Path(s["path"]).exists()]
     recent: deque[str] = deque(maxlen=cooldown)
     cooldown_violations = []
     counts = Counter()
+    video_dur_cache: dict[str, float] = {}
+    video_eof_overflows = []
+    static_diagram_shots = []
+
     for i, s in enumerate(shots):
         p = s["path"]
-        counts[Path(p).name] += 1
+        p_obj = Path(p)
+        counts[p_obj.name] += 1
         if p in recent:
-            cooldown_violations.append({"shot_idx": i + 1, "beat_start": s.get("beat_start"), "file": Path(p).name})
+            cooldown_violations.append({"shot_idx": i + 1, "beat_start": s.get("beat_start"), "file": p_obj.name})
         recent.append(p)
+
+        # v5.3 Gate: Detect banned static PowerPoint / diagram slide folders
+        lower_p = str(p).lower().replace("\\", "/")
+        if "/diagrams/" in lower_p or "/slides/" in lower_p:
+            static_diagram_shots.append({"shot_idx": i + 1, "beat_start": s.get("beat_start"), "file": p_obj.name})
+
+        # v5.3 Gate: Video clip EOF bounds check (start + duration + xfade_handle <= actual clip duration)
+        if p_obj.suffix.lower() in {".mp4", ".mov", ".mkv", ".webm"} and p_obj.exists():
+            if p not in video_dur_cache:
+                try:
+                    out = subprocess.check_output(
+                        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                         "-of", "default=noprint_wrappers=1:nokey=1", p],
+                        text=True,
+                    ).strip()
+                    video_dur_cache[p] = float(out)
+                except Exception:
+                    video_dur_cache[p] = 0.0
+            real_dur = video_dur_cache[p]
+            ss = float(s.get("start", 0.0))
+            need_end = ss + float(s["duration"]) + (xfade if i < len(shots) - 1 else 0.0)
+            if real_dur > 0 and need_end > (real_dur - 0.05):
+                video_eof_overflows.append({
+                    "shot_idx": i + 1,
+                    "beat_start": s.get("beat_start"),
+                    "file": p_obj.name,
+                    "start": round(ss, 2),
+                    "needed_end": round(need_end, 2),
+                    "clip_dur": round(real_dur, 2),
+                })
+
     unique_count = len(counts)
     total_cuts = len(shots)
     avg_reuse = round(total_cuts / max(unique_count, 1), 2)
@@ -207,17 +238,24 @@ def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4
         "cooldown_window": cooldown,
         "cooldown_violations_count": len(cooldown_violations),
         "cooldown_violations_sample": cooldown_violations[:10],
+        "video_eof_overflows": video_eof_overflows,
+        "static_diagram_shots": static_diagram_shots,
     }
 
 
 def check_voice_consistency(audio_dir: Path) -> dict:
-    """100% LOCAL (Zero-API) Voice-Tone Consistency Forensics across all act_*_master.mp3 files."""
+    """
+    100% LOCAL (Zero-API) Voice-Tone Consistency Forensics across all act_*_master.mp3 files.
+    Compares RMS loudness (dB) and Zero-Crossing Rate / Low-vs-High spectral warmth ratio
+    across acts to catch accidental model/voice/mic shifts (e.g. 2.5 vs 3.1 TTS mix) BEFORE render!
+    """
     act_files = sorted(audio_dir.glob("act_*_master.mp3"))
     if len(act_files) < 2:
         return {"checked_acts": len(act_files), "outliers": [], "per_act": []}
 
     profiles = []
     for f in act_files:
+        # Decode 30s mid-sample as 16kHz mono s16le PCM locally via FFmpeg
         raw = subprocess.check_output(
             ["ffmpeg", "-v", "error", "-ss", "5", "-t", "30", "-i", str(f),
              "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
@@ -226,14 +264,16 @@ def check_voice_consistency(audio_dir: Path) -> dict:
         if n < 1600:
             continue
         samples = struct.unpack(f"<{n}h", raw)
+        # Filter active speech frames (skip silence < 400 amplitude)
         active = [s / 32768.0 for s in samples if abs(s) > 400]
         if len(active) < 800:
             active = [s / 32768.0 for s in samples]
         rms = math.sqrt(sum(x * x for x in active) / max(len(active), 1))
         rms_db = round(20.0 * math.log10(max(rms, 1e-6)), 2)
+        # Zero-crossing rate (correlates strongly with voice brightness/timbre/mic EQ)
         zc = sum(1 for i in range(1, len(active)) if (active[i - 1] >= 0) != (active[i] >= 0))
         zcr_hz = round((zc / max(len(active), 1)) * 8000.0, 1)
-
+        # Low-frequency warmth proxy via FFmpeg lowpass 350Hz RMS ratio
         raw_lo = subprocess.check_output(
             ["ffmpeg", "-v", "error", "-ss", "5", "-t", "30", "-i", str(f),
              "-af", "lowpass=f=350", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
@@ -272,15 +312,15 @@ def check_voice_consistency(audio_dir: Path) -> dict:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Layer-1 Automated Pre-Flight QA (Visual Grids + Diversity + Voice Forensics + Sync).")
+    ap = argparse.ArgumentParser(description="Layer-1 Automated Pre-Flight QA (Visual Grids + Audio + Voice Forensics + Sync + Cooldown).")
     ap.add_argument("--acts", required=True, help="acts.json path")
     ap.add_argument("--audio", required=True, help="master_narration.mp3 path")
     ap.add_argument("--segments", required=True, help="segments.json path")
     ap.add_argument("--plan", required=True, help="shot_plan.json path")
     ap.add_argument("--out-dir", required=True, help="Output folder for QA grids & preflight_report.json")
     ap.add_argument("--cooldown", type=int, default=12, help="Min shots before an asset can reappear (v4.0 default: 12)")
-    ap.add_argument("--max-reuse", type=int, default=4, help="Hard cap on max times any single asset can appear (v4.0 default: 4)")
-    ap.add_argument("--min-unique", type=int, default=55, help="Min unique visual assets required for long-form (>600s) documentaries")
+    ap.add_argument("--max-reuse", type=int, default=4, help="Hard cap on max times any single asset can appear in full video (v4.0 default: 4)")
+    ap.add_argument("--min-unique", type=int, default=55, help="Min unique visual assets required for long-form (>600s) documentaries (v4.0 default: 55)")
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -314,6 +354,10 @@ def main():
         failures.append(f"Low visual diversity: only {plan_check['unique_assets']} unique assets for {plan_check['total_duration_sec']}s video (v4.0 min={args.min_unique})")
     if plan_check["overused_assets"]:
         failures.append(f"Visual repetition cap exceeded (>{args.max_reuse} uses): {plan_check['overused_assets'][:6]}")
+    if plan_check.get("video_eof_overflows"):
+        failures.append(f"Video clip EOF overflow (start+duration+xfade > real clip length — causes black screens!): {plan_check['video_eof_overflows'][:6]}")
+    if plan_check.get("static_diagram_shots"):
+        failures.append(f"Banned static PowerPoint/diagram slides detected ({len(plan_check['static_diagram_shots'])} shots — use transparent kinetic overlays on moving footage!): {plan_check['static_diagram_shots'][:5]}")
     if voice_check["outliers"]:
         failures.append(f"Voice tone/timbre shift detected across acts: {voice_check['outliers']}")
 

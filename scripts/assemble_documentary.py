@@ -1,5 +1,5 @@
-﻿"""
-GMZ Documentary Studio v3.5 â€” Ultra-Fast Pro Cinema 16:9 @ 60fps Assembler
+"""
+GMZ Documentary Studio v3.5 — Ultra-Fast Pro Cinema 16:9 @ 60fps Assembler
 Speed & Quality Upgrades (v3.5):
 - Auto-Hardware GPU Encoder Detection: Probes Intel QuickSync (h264_qsv) & NVIDIA (h264_nvenc),
   using hardware GPU acceleration automatically when available (with automatic libx264 fallback).
@@ -12,7 +12,7 @@ Speed & Quality Upgrades (v3.5):
 - 3D AI Watermark Fix: Pre-crops 12% off bottom-right edges (crop=iw*0.88:ih*0.88:0:0) on 3d_images/.
 - Veo Border Crop Fix: crop_zoom=1.14 default, 1.20 specifically for veo_02_energia_liftoff.mp4.
 - Batched 0.25s Crossfade Transitions: Lossless PCM .mkv intermediates + exact inter-batch handles
-  + Â±0.15s sync guard (ZERO OOM, ZERO AAC priming drift!).
+  + ±0.15s sync guard (ZERO OOM, ZERO AAC priming drift!).
 - Single True Two-Pass Loudnorm (I=-13:TP=-1.5:LRA=9, linear=true) + Clean 2.5s BGM fade-out.
 - Sleek Playwright Glassmorphism GMZ Badge PNG + Auto Layer-2 QA Proxy Chunk Generator!
 """
@@ -116,7 +116,7 @@ def render_gmz_badge_png(badge_text: str, out_png: Path) -> Path:
 
 def shot_cache_key(shot: dict, render_dur: float, fps: int, width: int, height: int, enc_name: str) -> str:
     payload = {
-        "v": "5.0",
+        "v": "5.3_eof_shield",
         "path": str(Path(shot["path"]).resolve()),
         "mtime": Path(shot["path"]).stat().st_mtime if Path(shot["path"]).exists() else 0,
         "split_right": str(Path(shot["split_right"]).resolve()) if shot.get("split_right") else "",
@@ -136,7 +136,7 @@ def shot_cache_key(shot: dict, render_dur: float, fps: int, width: int, height: 
 
 
 def sfx_aeval_expr(sfx_name: str) -> str | None:
-    """Procedural copyright-free cinema SFX (whoosh, bass_hit, pop, riser) for Cinema Documentary punch!"""
+    """Procedural copyright-free cinema SFX (whoosh, bass_hit, pop, riser) for Daily Learn 3.0 punch!"""
     if sfx_name == "whoosh":
         return "aevalsrc='0.35*sin(2*PI*(180+700*t)*t)*exp(-4.5*t) + 0.15*sin(2*PI*(90+240*t)*t)*exp(-3.5*t)':s=44100:d=0.45:c=mono,aresample=44100,aformat=channel_layouts=stereo,volume=-8dB"
     if sfx_name == "bass_hit":
@@ -221,50 +221,63 @@ def build_clip(
                 *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
             ]
     else:
-        ss = float(shot.get("start", 0.0))
-        default_crop = 1.14
+        # v5.3 EOF Shield: probe real video duration and auto-clamp start offset so xfade NEVER hits EOF/black screen!
+        real_dur = probe_duration(src)
+        raw_ss = float(shot.get("start", 0.0))
+        max_safe_ss = max(0.0, real_dur - render_dur - 0.15)
+        ss = min(raw_ss, max_safe_ss)
+        if raw_ss > max_safe_ss + 0.05:
+            print(f"  [EOF SHIELD] Clamped {src.name} start {raw_ss:.2f}s -> {ss:.2f}s (clip={real_dur:.2f}s, need={render_dur:.2f}s)")
+        tpad_filter = ""
+        if render_dur > (real_dur - ss - 0.05):
+            pad_sec = max(0.25, render_dur - (real_dur - ss) + 0.25)
+            tpad_filter = f",tpad=stop_mode=clone:stop_duration={pad_sec:.3f}"
+
+        default_crop = 1.20 if "veo_02_energia_liftoff" in src.name.lower() else 1.14
         crop_zoom = float(shot.get("crop_zoom", default_crop))
         sw, sh = int(width * crop_zoom), int(height * crop_zoom)
         vf = (
             f"scale={sw}:{sh}:force_original_aspect_ratio=increase,"
-            f"crop={width}:{height},fps={fps},{grade}{fades},format={pix_fmt}"
+            f"crop={width}:{height}:0:0,fps={fps}{tpad_filter},{grade}{fades},format={pix_fmt}"
         )
         keep_sfx = shot.get("keep_native_sfx", True) and has_audio_stream(src)
         sfx_fade_out_st = max(render_dur - 0.18, 0.0)
         if keep_sfx:
             af = (
                 f"volume=-16dB,aresample=44100,aformat=channel_layouts=stereo,"
+                f"apad=whole_dur={render_dur:.3f},atrim=0:{render_dur:.3f},"
                 f"afade=t=in:st=0:d=0.15,afade=t=out:st={sfx_fade_out_st:.3f}:d=0.18"
             )
             if callout:
                 cmd = [
-                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{render_dur:.3f}", "-i", str(src),
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
                     "-loop", "1", "-i", str(callout),
                     "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v];[0:a]{af}[a]",
-                    "-map", "[v]", "-map", "[a]",
+                    "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
                 ]
             else:
                 cmd = [
-                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{render_dur:.3f}", "-i", str(src),
-                    "-vf", vf, "-af", af,
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
+                    "-t", f"{render_dur:.3f}", "-vf", vf, "-af", af,
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
                 ]
         else:
             if callout:
                 cmd = [
-                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{render_dur:.3f}", "-i", str(src),
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
                     "-loop", "1", "-i", str(callout),
                     "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                    "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v]",
-                    "-map", "[v]", "-map", "2:a", "-t", f"{render_dur:.3f}",
+                    "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v];[2:a]apad=whole_dur={render_dur:.3f}[a]",
+                    "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
                 ]
             else:
                 cmd = [
-                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-t", f"{render_dur:.3f}", "-i", str(src),
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
                     "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
                     "-map", "0:v", "-map", "1:a", "-t", f"{render_dur:.3f}", "-vf", vf,
+                    "-af", f"apad=whole_dur={render_dur:.3f}",
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
                 ]
 
@@ -475,9 +488,17 @@ def main():
         cpath = cache_dir / f"clip_{key}.mkv"
         clip_paths.append(cpath)
         target_durs.append(tdur)
+        cache_ok = False
         if cpath.exists() and cpath.stat().st_size > 20000:
+            try:
+                if probe_duration(cpath) >= (rdur - 0.08):
+                    cache_ok = True
+            except Exception:
+                cache_ok = False
+        if cache_ok:
             cached_hits += 1
         else:
+            cpath.unlink(missing_ok=True)
             to_render.append((idx, shot, cpath, rdur))
 
     print(f"[CLIPS] Total={len(shots)} | Cached={cached_hits} | To Render={len(to_render)}")
@@ -495,6 +516,10 @@ def main():
                 done_count += 1
                 if done_count % 10 == 0 or done_count == len(to_render):
                     print(f"  [RENDER {done_count}/{len(to_render)}] Done clip #{idx} ({Path(shot['path']).name})")
+
+    # Clean stale batch_*.mkv from any previous runs before joining
+    for old_b in tmp_dir.glob("batch_*.mkv"):
+        old_b.unlink(missing_ok=True)
 
     # Batched 0.25s xfade join with lossless PCM intermediates (.mkv) & exact inter-batch handle sync!
     batch_files: list[Path] = []
@@ -515,8 +540,13 @@ def main():
     joined_dur = probe_duration(video_joined)
     drift = abs(joined_dur - sum(target_durs))
     print(f"[SYNC CHECK] Joined video={joined_dur:.3f}s vs target={sum(target_durs):.3f}s (drift={drift:.3f}s)")
-    if drift > 0.15:
-        print(f"  [WARN] Video xfade drift {drift:.3f}s exceeded Â±0.15s tolerance!")
+    if drift > 0.25:
+        raise RuntimeError(
+            f"[CRITICAL SYNC ABORT] Video xfade drift {drift:.3f}s exceeded 0.25s! "
+            f"A clip ended short and would cause black frames. Inspect shot_plan.json video durations!"
+        )
+    elif drift > 0.15:
+        print(f"  [WARN] Video xfade drift {drift:.3f}s slightly exceeded ±0.15s tolerance.")
 
     master_audio_wav = tmp_dir / "final_audio_master.wav"
     two_pass_loudnorm_mix(
@@ -536,7 +566,7 @@ def main():
         cmd = [
             "ffmpeg", "-y",
             "-i", str(video_joined), "-i", str(master_audio_wav), "-i", str(badge_png),
-            "-filter_complex", f"[0:v][2:v]overlay=W-w-36:H-h-30,format={master_pix}[vout]",
+            "-filter_complex", f"[0:v][2:v]overlay=W-w-14:H-h-14,format={master_pix}[vout]",
             "-map", "[vout]", "-map", "1:a",
             "-t", f"{target_total:.3f}",
             *master_enc, "-r", str(args.fps),
@@ -580,5 +610,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

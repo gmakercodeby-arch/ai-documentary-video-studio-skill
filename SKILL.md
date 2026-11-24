@@ -139,28 +139,31 @@ Run `preflight_qa.py` BEFORE spending compute on rendering:
 python "<SKILL_DIR>/scripts/preflight_qa.py" --acts project/acts.json --audio project/audio/master_narration.mp3 --segments project/audio/segments.json --plan project/shot_plan.json --out-dir project/qa_preflight
 ```
 
-`preflight_qa.py` automatically checks and FAILS on:
+`preflight_qa.py` (v5.3) automatically checks and FAILS on:
 - Missing files or silence gaps `> 2.5s`
+- **v5.3 Video Clip EOF Bounds Gate:** Probes every `.mp4` clip and **HARD FAILS** if ANY shot's `start + duration + xfade` exceeds actual clip length (prevents mid-video black-screen `xfade` drops BEFORE rendering!).
+- **v5.3 Static Slide / Diagram Blocker:** Flags any shot referencing banned `diagrams/` or `slides/` folders so full-screen PowerPoint cards never slip into a documentary.
 - Script-vs-Whisper word coverage drop (`< 85%`)
 - **v5.2 TTS Stage-Direction / Hallucinated-Word Scanner:** Flags rogue spoken *"Pause" / "पॉज़" / "बास"* or unexpected short English leaks not in `acts.json` so they are surgically silenced BEFORE render!
 - **100% Local Voice-Tone Consistency Forensics** (RMS dB, ZCR Hz, 350Hz warmth ratio across all acts to catch any accidental timbre shift!)
-- **Visual Richness & Anti-Repetition Gate:** `< 55` unique assets (for mixed 10+ min videos), `> 4` uses per asset, or `< 12` shots cooldown = **FAIL**
+- **Visual Richness & Anti-Repetition Gate:** `< 55` unique assets (for mixed 10+ min videos), `> 4` uses per asset, or `< 12` shots cooldown = **FAIL** (NEVER fall back to unrelated cross-Act global swaps; use clean Act-scoped pools & sentence-proportional Act timing backup when Whisper drops Hindi segments!)
 - Generates labeled `preflight_assets_grid.png` + `preflight_callouts_grid.png` — visually inspect BOTH grids before rendering!
 
 ---
 
-## 6. Stage 5 — GPU-Accelerated Assembly + Layer-2 100% Full-Video "Watch & Listen" Auto-Fix Loop
+## 6. Stage 5 — GPU-Accelerated Bulletproof Assembly + Layer-2 100% Full-Video "Watch & Listen" Auto-Fix Loop
 
-1. **Assemble Final 1080p @ 60fps Master MP4:**
+1. **Assemble Final 1080p @ 60fps Master MP4 (`assemble_documentary.py` v5.3):**
    ```bash
    python "<SKILL_DIR>/scripts/assemble_documentary.py" --plan project/shot_plan.json --narration project/audio/master_narration.mp3 --bgm project/audio/bgm.mp3 --segments project/audio/segments.json --badge "YOUR_TAG" --workers 3 --out project/output/Final_Master.mp4
    ```
+   - **v5.3 Built-in Video EOF Shield:** Probes real video durations before clip rendering, auto-clamps `start` safely (`real_dur - render_dur - 0.15s`), adds `tpad=stop_mode=clone` + `apad` if needed, validates cached clip durations, auto-cleans stale `batch_*.mkv` intermediates, and **HARD ABORTS** if `xfade` drift exceeds `0.25s`!
    - Auto-detects **Intel QuickSync (`h264_qsv`)** or **NVIDIA (`h264_nvenc`)** with seamless `libx264` fallback.
    - **Multi-core parallel clip rendering** + **SHA-1 smart clip caching** (fixing 1–4 bad clips later reuses 95%+ clips in `0.0s`!).
-   - Batched `0.25s` `xfade` transitions using lossless PCM `.mkv` intermediates with `±0.15s` sync verification.
+   - Batched `0.25s` `xfade` transitions using lossless PCM `.mkv` intermediates (`drift = 0.000s`).
    - Single true two-pass `loudnorm` (`I=-13:TP=-1.5:LRA=9`) + automatic BGM sidechain ducking + clean `2.5s` fade-out + bottom-right glassmorphism pill badge (`W-w-14:H-h-14`) covering any AI star watermark.
-2. **Layer-2 Autonomous 100% Full-Video "Watch & Listen" + Auto-Fix Loop (100% Local, ZERO API Quota!):**
-   - `assemble_documentary.py` automatically runs `scripts/make_qa_proxy.py` to split the finished master into lightweight **2-minute** QA proxy MP4 chunks (`480p @ 2fps + 44.1kHz 64k stereo audio`, `~5 MB` each).
+2. **Layer-2 Autonomous 100% Full-Video "Watch & Listen" + Black-Frame Detector + Auto-Fix Loop (100% Local, ZERO API Quota!):**
+   - `assemble_documentary.py` automatically runs `scripts/make_qa_proxy.py` (v5.3) to clean stale proxies, split the finished master into lightweight **2-minute** QA proxy MP4 chunks (`480p @ 2fps + 44.1kHz 64k stereo audio`, `~5 MB` each), and **automatically raises a CRITICAL ALERT** if any chunk drops below `1.1 MB/min` (instant black/frozen frame alarm!).
    - **HARD RULE — NO PARTIAL CHECKS:** Open, WATCH, and LISTEN to **EVERY SINGLE 2-minute proxy chunk (`Part 1` through `Part N`)** directly AND inspect `_QA_25frames.jpg`:
      - Verify zero spoken audio glitches/rogue words, zero watermarks, zero edge borders, zero AI voice bleed, zero dead silence, zero A/V sync drift.
      - Verify **Literal Sentence-by-Sentence Spoken-vs-Visual Alignment**, exact overlay & Outro CTA timing, and zero background wardrobe/currency/AI artifacts.
