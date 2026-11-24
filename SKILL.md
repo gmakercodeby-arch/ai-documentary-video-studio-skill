@@ -1,17 +1,18 @@
 ---
 name: ai-documentary-studio
 description: >-
-  End-to-end AI Documentary Video-Making Studio Skill (v4.0 Pro Studio) for producing
-  12-to-25 minute 16:9 @ 60fps YouTube Documentaries, Engineering Explainers, Factory
-  Deep-Dives, and "What If" Science Videos. Features an automatic first-run AI Setup Wizard,
-  8-Act retention scripting with literal word-to-object visual grounding (60-85+ unique visuals,
-  zero lazy repetition), single-model Gemini 3.1 Flash TTS (Fenrir baritone), Google Flow
-  Veo 3.1 + 3D cutaway pipeline, hardware GPU (Intel QSV / NVIDIA NVENC) parallel FFmpeg
-  assembly with SHA-1 clip caching, Playwright glassmorphism callouts & badges, and a
-  2-Layer Autonomous "Eyes & Ears" Zero-Defect QA Engine.
+  End-to-end AI Documentary Video-Making Studio Skill (v5.2 Zero-Defect Cinema Engine) for producing
+  10-to-25 minute 16:9 @ 60fps YouTube Documentaries, Business Case Studies, Engineering Explainers,
+  Factory Deep-Dives, and "What If" Science Videos. Features an automatic first-run AI Setup Wizard,
+  8-Act retention scripting with sentence-exact Whisper visual grounding, single-model Gemini 3.1
+  Flash TTS (Fenrir baritone) with automated TTS stage-direction hallucination scanning, Google Flow
+  Omni 1.2 Flash / Veo 3.1 smart 360p/720p credit-saving pipeline, 5-frame sub-beat scrubbing,
+  hardware GPU (Intel QSV / NVIDIA NVENC) parallel FFmpeg assembly with SHA-1 clip caching,
+  Playwright kinetic HUD overlays & glassmorphism badges, and a 2-Layer Autonomous 100% Full-Video
+  "Watch & Listen" + Auto-Fix QA Engine.
 ---
 
-# AI Documentary Video-Making Studio Skill (v4.0 Pro Studio)
+# AI Documentary Video-Making Studio Skill (v5.2 Zero-Defect Cinema Engine)
 
 Turn any AI coding agent (Antigravity, Claude Code, Cursor, Gemini CLI, Codex) into a **full autonomous 1080p @ 60fps YouTube Documentary Production Studio**.
 
@@ -94,6 +95,14 @@ Match clip duration to the story beat (`Omni 1.2 Flash` ~3 credits/sec, `count=1
 [5.5-8.0s] Dramatic hero payoff / reaction / macro detail reveal.
 Cinematography: 35mm anamorphic documentary lens, dramatic rim lighting, authentic Foley SFX (specific mechanical/water/wind sounds), NO text, NO spoken dialogue.
 ```
+**Smart Resolution Allocation (70/30 Credit Saver):**
+- Use **`720p`** for hero narrative scenes, close-ups, office interiors, 3D financial vaults, and key reveals where crisp detail matters.
+- Use **`360p` (~14 credits)** for distant aerial highways, night traffic B-roll, and rapid transitional clips to conserve 50%+ video generation credits without hurting perceived 1080p60 quality.
+
+**Realistic Civilian Wardrobe & Anti-Police Guardrail:**
+- NEVER use ambiguous words like `"khaki"` or generic `"uniform"` for civilian managers, staff, or shopkeepers (video AI models hallucinate police uniforms, peaked caps, epaulets, and badges).
+- ALWAYS specify exact civilian attire (*"civilian formal light-blue/white button-down shirt with spectacles and pen"*, *"corporate navy polo shirt"*) and explicitly append *"Civilian attire ONLY, NO police uniform, NO badges, NO military epaulets"*.
+
 **Zero-Skip Failure & Retry Protocol (NEVER Silently Skip a Failed Clip!):**
 1. **Retry #1 (Cooldown + `flow_retry` / fresh queue):** Pause 20–30s on `PUBLIC_ERROR_UNUSUAL_ACTIVITY` or timeout and retry cleanly (ensure no duplicate browser tab is open on the same project).
 2. **Retry #2 (Prompt / Model Rescue):** Simplify safety-trigger words, switch between `Omni 1.2 Flash` and `veo-3.1-fast`, or step duration down (`15s -> 8s`) and regenerate.
@@ -115,8 +124,16 @@ Read EVERY sentence of `acts.json` BEFORE generating/sourcing visuals and list E
 
 ---
 
-## 5. Stage 4 — Mandatory Layer-1 Pre-Flight QA (BEFORE Rendering)
+## 5. Stage 4 — Sub-Beat Scrubbing & Layer-1 Pre-Flight QA (BEFORE Rendering)
 
+### Step 4A — ZERO Blind Round-Robin & Mandatory 5-Frame Sub-Beat Scrubbing (HARD RULE)
+- **NEVER** auto-cycle (`clip_ptr % len(clips)`) clips across an Act or guess overlay timestamps (`14.5`, `185.0`, `635.0`).
+- Before writing `shot_plan.json`, generate a **5-frame sub-beat storyboard strip** of EVERY multi-beat Flow clip so you know what each second shows, and **surgically exclude bad AI sub-beats** (background police/khaki guards, Bitcoin `₿` or foreign currency where local currency belongs, unrelated fire/logo transitions, wrong-region trucks).
+- Pin **every single sentence/clause AND every kinetic overlay** (including the **1-Click Website Outro CTA card**) directly to its exact Whisper timestamp in `segments.json`.
+- Whenever a user-approved 1-minute Pilot (`pilot_shot_plan.json`) exists, preserve its exact Act 1 scene mapping in the full master plan.
+- Never drop a vertical split-screen divider line across a single non-split clip; use clean side-by-side comparison cards or real dual-clip split-screen footage.
+
+### Step 4B — Automated Layer-1 Pre-Flight QA (`preflight_qa.py` v5.2)
 Run `preflight_qa.py` BEFORE spending compute on rendering:
 ```bash
 python "<SKILL_DIR>/scripts/preflight_qa.py" --acts project/acts.json --audio project/audio/master_narration.mp3 --segments project/audio/segments.json --plan project/shot_plan.json --out-dir project/qa_preflight
@@ -125,26 +142,26 @@ python "<SKILL_DIR>/scripts/preflight_qa.py" --acts project/acts.json --audio pr
 `preflight_qa.py` automatically checks and FAILS on:
 - Missing files or silence gaps `> 2.5s`
 - Script-vs-Whisper word coverage drop (`< 85%`)
+- **v5.2 TTS Stage-Direction / Hallucinated-Word Scanner:** Flags rogue spoken *"Pause" / "पॉज़" / "बास"* or unexpected short English leaks not in `acts.json` so they are surgically silenced BEFORE render!
 - **100% Local Voice-Tone Consistency Forensics** (RMS dB, ZCR Hz, 350Hz warmth ratio across all acts to catch any accidental timbre shift!)
-- **v4.0 Visual Richness Gate:** `< 55` unique assets for 10+ min videos = **FAIL**
-- **v4.0 Anti-Repetition Gate:** Any asset used `> 4` times OR reappearing within `< 12` shots = **FAIL**
+- **Visual Richness & Anti-Repetition Gate:** `< 55` unique assets (for mixed 10+ min videos), `> 4` uses per asset, or `< 12` shots cooldown = **FAIL**
 - Generates labeled `preflight_assets_grid.png` + `preflight_callouts_grid.png` — visually inspect BOTH grids before rendering!
 
 ---
 
-## 6. Stage 5 — GPU-Accelerated Assembly + Layer-2 "Watch & Listen" QA
+## 6. Stage 5 — GPU-Accelerated Assembly + Layer-2 100% Full-Video "Watch & Listen" Auto-Fix Loop
 
 1. **Assemble Final 1080p @ 60fps Master MP4:**
    ```bash
    python "<SKILL_DIR>/scripts/assemble_documentary.py" --plan project/shot_plan.json --narration project/audio/master_narration.mp3 --bgm project/audio/bgm.mp3 --segments project/audio/segments.json --badge "YOUR_TAG" --workers 3 --out project/output/Final_Master.mp4
    ```
    - Auto-detects **Intel QuickSync (`h264_qsv`)** or **NVIDIA (`h264_nvenc`)** with seamless `libx264` fallback.
-   - **Multi-core parallel clip rendering** + **SHA-1 smart clip caching** (fixing 1 bad clip later reuses 95%+ clips in `0.0s`!).
+   - **Multi-core parallel clip rendering** + **SHA-1 smart clip caching** (fixing 1–4 bad clips later reuses 95%+ clips in `0.0s`!).
    - Batched `0.25s` `xfade` transitions using lossless PCM `.mkv` intermediates with `±0.15s` sync verification.
-   - Single true two-pass `loudnorm` (`I=-13:TP=-1.5:LRA=9`) + automatic BGM sidechain ducking + clean `2.5s` fade-out.
-2. **Layer-2 Autonomous "Watch & Listen" Post-Render QA (100% Local, ZERO API Quota!):**
+   - Single true two-pass `loudnorm` (`I=-13:TP=-1.5:LRA=9`) + automatic BGM sidechain ducking + clean `2.5s` fade-out + bottom-right glassmorphism pill badge (`W-w-14:H-h-14`) covering any AI star watermark.
+2. **Layer-2 Autonomous 100% Full-Video "Watch & Listen" + Auto-Fix Loop (100% Local, ZERO API Quota!):**
    - `assemble_documentary.py` automatically runs `scripts/make_qa_proxy.py` to split the finished master into lightweight **2-minute** QA proxy MP4 chunks (`480p @ 2fps + 44.1kHz 64k stereo audio`, `~5 MB` each).
-   - **Inspect EVERY 2-minute proxy chunk directly** (video + audio) AND check `_QA_25frames.jpg`:
-     - Verify zero watermarks, zero edge borders, zero AI voice bleed, zero dead silence, zero A/V sync drift.
-     - Verify **Literal Spoken-vs-Visual Alignment**: *"Does the screen show the exact object/concept the narrator is talking about? Does anything feel repetitive?"*
-   - Fix any defect in `shot_plan.json` and re-run `assemble_documentary.py` (instant SHA-1 cache!) BEFORE delivering the final video!
+   - **HARD RULE — NO PARTIAL CHECKS:** Open, WATCH, and LISTEN to **EVERY SINGLE 2-minute proxy chunk (`Part 1` through `Part N`)** directly AND inspect `_QA_25frames.jpg`:
+     - Verify zero spoken audio glitches/rogue words, zero watermarks, zero edge borders, zero AI voice bleed, zero dead silence, zero A/V sync drift.
+     - Verify **Literal Sentence-by-Sentence Spoken-vs-Visual Alignment**, exact overlay & Outro CTA timing, and zero background wardrobe/currency/AI artifacts.
+   - **Mandatory Auto-Fix Before Delivery:** If ANY defect is spotted in ANY chunk, **FIX IT IMMEDIATELY** (patch audio / remap `shot_plan.json` / adjust overlay timestamp), re-render via SHA-1 clip cache, rebuild affected proxies, and re-verify to 100% clean BEFORE delivering the final video!

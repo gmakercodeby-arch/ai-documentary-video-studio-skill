@@ -1,11 +1,11 @@
 <div align="center">
 
 <!-- Animated Cyber-Neon Header Banner -->
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0B1120,45:6D28D9,100:06B6D4&height=230&section=header&text=AI%20DOCUMENTARY%20STUDIO&fontSize=44&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=v5.0%20Cinema%20Engine%20%E2%80%A2%20Multi-Beat%20Veo%203.1%20%2B%20Kinetic%20HUD%20%2B%201080p%2060fps&descAlignY=62&descSize=16&descColor=FACC15" alt="AI Documentary Video-Making Studio v5.0 Banner" />
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0B1120,45:6D28D9,100:06B6D4&height=230&section=header&text=AI%20DOCUMENTARY%20STUDIO&fontSize=44&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=v5.2%20Zero-Defect%20Cinema%20%E2%80%A2%20Omni%201.2%20Flash%20%2B%20Auto-Fix%20QA%20%2B%201080p%2060fps&descAlignY=62&descSize=16&descColor=FACC15" alt="AI Documentary Video-Making Studio v5.2 Banner" />
 
 <!-- Animated Neon Typing Tagline -->
 <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
-  <img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=700&size=19&duration=2600&pause=700&color=38BDF8&center=true&vCenter=true&width=820&lines=Multi-Beat+Veo+3.1+Director+Prompting+(3+Beats+per+8s);Kinetic+Text+%2B+HUD+Pointers+%2B+Split-Screens+(Zero+Static+Slides);Built-in+Cinema+SFX+(Whoosh%2C+Bass+Hit%2C+Pop%2C+Riser);Hardware+GPU+(QSV%2FNVENC)+%2B+SHA-1+Smart+Caching;Autonomous+2-Layer+Watch+%26+Listen+QA+(Zero+API+Cost)" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=700&size=19&duration=2600&pause=700&color=38BDF8&center=true&vCenter=true&width=820&lines=Multi-Beat+Omni+1.2+Flash+%26+Veo+3.1+(Smart+360p%2F720p+Credit+Saver);Sentence-Exact+Whisper+Sync+%2B+5-Frame+Sub-Beat+Scrubbing;Auto+TTS+Hallucination+Scanner+%26+Anti-Police+Wardrobe+Guardrail;Hardware+GPU+(QSV%2FNVENC)+%2B+SHA-1+Smart+Caching;100%25+Full-Video+Watch+%26+Listen+%2B+Autonomous+Auto-Fix+Loop" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -13,7 +13,7 @@
 <!-- Primary Pro Badges -->
 <p align="center">
   <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
-    <img src="https://img.shields.io/badge/VERSION-5.0%20CINEMA%20ENGINE-FACC15?style=for-the-badge&logo=sparkles&logoColor=0B1120&labelColor=0F172A" alt="Version 5.0 Cinema Engine" />
+    <img src="https://img.shields.io/badge/VERSION-5.2%20ZERO--DEFECT%20CINEMA-FACC15?style=for-the-badge&logo=sparkles&logoColor=0B1120&labelColor=0F172A" alt="Version 5.2 Zero-Defect Cinema" />
   </a>
   <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
     <img src="https://img.shields.io/badge/OUTPUT-1080p%20%40%2060FPS%20CINEMA-06B6D4?style=for-the-badge&logo=ffmpeg&logoColor=FFFFFF&labelColor=0F172A" alt="1080p 60fps Cinema" />
@@ -57,7 +57,7 @@
 
 <br/>
 
-Designed from forensic reverse-engineering of viral multi-million-view Hindi & English engineering documentaries, **`v4.0 Pro Studio`** automates the entire production pipeline — from grounded research and 8-Act retention scripting to locked single-model Gemini TTS narration, **literal word-to-object visual matching (`60–85+` unique assets, zero lazy repetition)**, hardware GPU 60fps FFmpeg assembly, and **autonomous 2-Layer "Watch & Listen" QA** — all with **1-Click Install** and an **AI-Guided First-Run Setup Wizard**.
+Designed from forensic reverse-engineering of viral multi-million-view Hindi & English business and engineering documentaries, **`v5.2 Zero-Defect Cinema Engine`** automates the entire production pipeline — from grounded research and 8-Act retention scripting to locked single-model Gemini TTS narration (with automated spoken stage-direction hallucination detection), **sentence-exact Whisper visual sync + 5-frame sub-beat scrubbing**, smart `360p/720p` credit-saving video generation, hardware GPU 60fps FFmpeg assembly, and an **autonomous 100% Full-Video "Watch & Listen" + Auto-Fix QA Loop** — all with **1-Click Install** and an **AI-Guided First-Run Setup Wizard**.
 
 <!-- Studio Spec Highlights Strip -->
 <div align="center">

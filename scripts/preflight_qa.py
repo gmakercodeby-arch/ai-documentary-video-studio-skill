@@ -1,6 +1,6 @@
 """
-AI Documentary Studio v4.0 — Layer 1 Automated Pre-Flight QA (preflight_qa.py)
-Runs BEFORE spending compute on final MP4 rendering to catch 85%+ of defects in ~15 seconds:
+AI Documentary Studio v5.2 — Layer 1 Automated Pre-Flight QA (preflight_qa.py)
+Runs BEFORE spending compute on final MP4 rendering to catch 90%+ of defects in ~15 seconds:
   1. Visual Contact Sheet (preflight_assets_grid.png): 1 labeled frame from EVERY unique photo,
      3D render, and video clip used in shot_plan.json.
   2. Callout Preview Grid (preflight_callouts_grid.png): Every callout shot composited over its
@@ -8,8 +8,9 @@ Runs BEFORE spending compute on final MP4 rendering to catch 85%+ of defects in 
   3. Audio Silence Gate: Runs FFmpeg silencedetect on master narration (FAIL if any gap > 2.5s).
   4. 100% Local Voice-Tone Consistency Forensics: Compares RMS dB, ZCR Hz, and 350Hz warmth ratio
      across all act_*_master.mp3 files to catch accidental TTS model/voice shifts.
-  5. Script vs Whisper Coverage Diff: Catches clipped sentences or repeated endings.
-  6. v4.0 Visual Richness & Anti-Repetition Gate: Enforces >=55 unique assets (10+ min videos),
+  5. Script vs Whisper Coverage Diff + TTS Stage-Direction Hallucination Scanner:
+     Catches clipped sentences, repeated endings, and rogue spoken stage directions ("Pause" / "पॉज़").
+  6. Visual Richness & Anti-Repetition Gate: Enforces >=55 unique assets (10+ min videos),
      <=4 max uses per asset, and >=12 shots cooldown before any visual can reappear!
 """
 
@@ -148,12 +149,32 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
             gaps.append({"from": round(prev_end, 2), "to": round(float(s["start"]), 2), "gap_sec": g})
         prev_end = float(s["end"])
 
+    # v5.2: Detect TTS spoken stage-direction / hallucinated rogue words (e.g. spoken "Pause" / "पॉज़" / "बास")
+    full_script_lower = " ".join(a["text"] for a in acts).lower()
+    suspect_tokens = ["pause", "पॉज़", "पॉज", "पौज", "बास", "beat", "silence", "narrator", "cut to", "fade out"]
+    tts_hallucinations = []
+    for s in segs:
+        txt = s["text"].strip()
+        txt_l = txt.lower()
+        dur_s = round(float(s["end"]) - float(s["start"]), 2)
+        if len(txt.split()) <= 3 and dur_s <= 1.6:
+            for tok in suspect_tokens:
+                if tok in txt_l and tok not in full_script_lower:
+                    tts_hallucinations.append({
+                        "start": round(float(s["start"]), 2),
+                        "end": round(float(s["end"]), 2),
+                        "text": txt,
+                        "matched_token": tok,
+                    })
+                    break
+
     return {
         "script_words": script_words,
         "whisper_words": whisper_words,
         "word_coverage_ratio": ratio,
         "tail_duplicate_detected": tail_repeat,
         "whisper_gaps_over_2_5s": gaps,
+        "tts_hallucinations": tts_hallucinations,
         "last_spoken_end": round(prev_end, 2),
         "audio_duration": seg_data.get("duration"),
     }
@@ -283,6 +304,8 @@ def main():
         failures.append(f"Audio silences > 2.5s found: {len(silences)}")
     if diff["whisper_gaps_over_2_5s"]:
         failures.append(f"Whisper transcript gaps > 2.5s: {diff['whisper_gaps_over_2_5s']}")
+    if diff.get("tts_hallucinations"):
+        failures.append(f"TTS spoken stage-direction hallucinations detected (MUST silence/trim before render!): {diff['tts_hallucinations']}")
     if diff["word_coverage_ratio"] < 0.85:
         failures.append(f"Low script-to-audio word coverage: {diff['word_coverage_ratio']}")
     if plan_check["cooldown_violations_count"] > 0:
