@@ -130,8 +130,10 @@ def main():
             mult = v["views"] / med
             if mult >= args.min_mult:
                 c_score = score_3d_cinema(v["title"])
-                # Composite rank blends Outlier Multiple + 3D AI Cinema visual suitability
-                gmz_score = round(mult * (0.7 + 0.08 * c_score), 2)
+                # Normalize tiny pivoting channels (median < 50K) so 500x ratios don't drown out established hits
+                norm_mult = v["views"] / max(med, 50000)
+                # Composite rank blends Normalized Outlier Multiple + 3D AI Cinema visual suitability
+                gmz_score = round(norm_mult * (0.7 + 0.08 * c_score), 2)
                 outliers.append({
                     "channel": v["channel"],
                     "lang": v["lang"],

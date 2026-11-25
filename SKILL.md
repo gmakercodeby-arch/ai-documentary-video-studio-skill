@@ -55,7 +55,7 @@ If `.env` or `studio_config.json` is missing (or any required dependency is abse
 
 ## 2. Stage 1 — Viral Topic Discovery, Grounded Research & 8-Act Script
 
-0. **Find a High-Outlier Topic First (Recommended):** Before locking a new topic, run the bundled `gmz-viral-topic-hunter` companion skill (`python "<SKILL_DIR>/skills/gmz-viral-topic-hunter/scripts/hunt_viral_topics.py" --group all --min-mult 1.8 --min-views 150000 --out-dir "./topic_research"`) across **31** Hindi & Global Engineering + Business Case-Study channels via `yt-dlp` (zero API key) to spot `2x–35x` channel-median outliers and Global-to-Hindi arbitrage winners.
+0. **Find a High-Outlier Topic First (Recommended):** Before locking a new topic, run the bundled `gmz-viral-topic-hunter` companion skill (`python "<SKILL_DIR>/skills/gmz-viral-topic-hunter/scripts/hunt_viral_topics.py" --group all --min-mult 1.8 --min-views 150000 --out-dir "./topic_research"`) across **32** Hindi & Global Engineering + Business Case-Study channels via `yt-dlp` (zero API key) to spot `2x–35x` channel-median outliers and Global-to-Hindi arbitrage winners.
 1. **Fact-Check First:** Research real numbers, dates, engineering physics, and turning points (via `notebooklm` MCP or verified web/engineering sources) — zero hallucinated stats.
 2. **Write `acts.json` Act-by-Act (8 Acts, `~250–420` words each):**
    - **Act 1 — Cinema Cold-Open + Video-End Open Loop:** ZERO *"Hello guys welcome to my channel"*. Drop straight into a tense visual scene and plant a burning mystery loop.

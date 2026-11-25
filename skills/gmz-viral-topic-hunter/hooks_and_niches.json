@@ -10,6 +10,7 @@
     ],
     "hindi_business_casestudy": [
       {"name": "HinExp", "url": "https://www.youtube.com/@HinExpofficial/videos", "lang": "hi", "category": "business", "note": "Top Hindi AI-illustrated business case studies (Qualis 4M, Bus 2.1M, Hero Honda 1.8M, Petrol Pump 1.2M, Nvidia Spy 496K)"},
+      {"name": "Paisa Decode", "url": "https://www.youtube.com/@PaisaDecodeHQ/videos", "lang": "hi", "category": "business", "note": "Small-sub rocket (41K subs -> 1.4M Turf, 1.0M PS5 Cafe, 981K Petrol Pump): ₹ ticket-price + 2nd-person simulation unit economics"},
       {"name": "Think School", "url": "https://www.youtube.com/@ThinkSchool/videos", "lang": "hi", "category": "business", "note": "India's top business, brand & geopolitics case studies"},
       {"name": "Aevy TV", "url": "https://www.youtube.com/@AevyTV/videos", "lang": "hi", "category": "business", "note": "Cinematic Indian industry, startup & economy deep-dives"},
       {"name": "Nitish Rajput", "url": "https://www.youtube.com/@NitishRajput/videos", "lang": "hi", "category": "business", "note": "Massive Hindi analytical documentaries on scams, brands & systems"},
@@ -42,7 +43,7 @@
   },
   "title_formulas": [
     {"name": "Why Brand Killed Its Hit / Downfall", "patterns": ["killed", "how .* died", "crashed", "split", "left india", "fall of", "destroyed", "dying", "खत्म", "डूब", "क्यों बंद", "बर्बाद"]},
-    {"name": "Desi Unit Economics / Profit Reality", "patterns": ["economics of", "owning a", "business behind", "system in \\d+", "makes? .* money", "kitna kamata", "कितना कमाता", "बिज़नेस", "मुनाफा", "करोड़"]},
+    {"name": "Desi Unit Economics / Profit Reality", "patterns": ["economics of", "owning a", "business behind", "system in \\d+", "makes? .* money", "actually make", "owner keep", "kitna bachta", "kitna kamata", "kahan gaya", "asli mein", "कितना कमाता", "कितना बचता", "बिज़नेस", "मुनाफा", "करोड़"]},
     {"name": "Corporate Spy / Dark Truth Exposed", "patterns": ["\\bspy\\b", "scandal", "dark truth", "nobody saw", "secret", "steal", "fraud", "scam", "खेल", "राज़", "सच", "धोखा"]},
     {"name": "Impossible Engineering / Physics Paradox", "patterns": ["\\bimpossible\\b", "how .* work", "actually works", "insane engineering", "defies physics", "कैसे", "असंभव", "नामुमकिन"]},
     {"name": "Inside X-Ray / Hidden Factory Reveal", "patterns": ["\\binside\\b", "how .* made", "factory", "underwater", "underground", "बनाया", "अंदर", "कारखाना", "फैक्ट्री"]},
@@ -56,10 +57,12 @@
     "battery", "chip", "gpu", "semiconductor", "engine", "turbine", "train", "bullet", "hyperloop", "robot",
     "factory", "mine", "vault", "bunker", "satellite", "laser", "reactor", "oil", "rig", "airport", "skyscraper",
     "car", "toyota", "qualis", "tata", "honda", "hero", "bajaj", "suzuki", "tavera", "bus", "truck", "petrol",
-    "hotel", "mall", "bazaar", "nvidia", "spy", "bank", "empire", "warehouse", "delivery", "swiggy", "zomato",
+    "hotel", "mall", "bazaar", "nvidia", "spy", "bank", "empire", "warehouse", "delivery", "swiggy", "zomato", "blinkit",
+    "turf", "cricket", "ps5", "gaming", "cafe", "water", "sleeper", "momo", "franchise", "cloud kitchen", "coaching", "kirana",
     "विमान", "रॉकेट", "जहाज", "सुरंग", "फैक्ट्री", "इंजन", "बैटरी", "बांध", "सैटेलाइट", "सबमरीन", "पुल", "कार", "पेट्रोल", "कंपनी"
   ],
   "proven_viral_archetypes_hi": [
+    "Exact Ticket-Price Unit Economics + 'Maano Tum Khud Kholte Ho' Simulation (Paisa Decode 41K subs -> 1.4M Turf, 1.0M PS5 Cafe, 981K Petrol Pump)",
     "Nostalgic Indian Car/Vehicle Killed at Peak (e.g. Qualis 4.0M, Tavera 1.1M, Nano, Contessa, Gypsy, Ambassador, Kinetic Honda, Rajdoot)",
     "Legendary Indian Joint-Venture / Family Split (e.g. Hero Honda 1.8M, TVS Split 425K, Bajaj-Kawasaki, Maruti-Suzuki early war, Raymond)",
     "Indian Retail / Startup Crash vs Desi Giant (e.g. Big Bazaar 1.1M, Balaji vs Lays 456K, DMart 704K, Sugar Cosmetics 879K, Byju's, Dunzo)",

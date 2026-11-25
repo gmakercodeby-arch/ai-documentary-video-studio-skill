@@ -1,22 +1,22 @@
 ---
 name: gmz-viral-topic-hunter
-description: Automated Multi-Channel YouTube Outlier & Viral Topic Discovery Skill for GMZ DECODED. Uses local yt-dlp to scan 31+ top Hindi & Global Engineering/Documentary/Business Case-Study channels (including Daily Learn 3.0, HinExp, Think School, Nitish Rajput, Branch Education, Animagraffs, MagnatesMedia), calculates outlier multipliers, detects Global-to-Hindi arbitrage opportunities, and outputs high-CTR documentary & 9:16 Short ideas.
+description: Automated Multi-Channel YouTube Outlier & Viral Topic Discovery Skill for GMZ DECODED. Uses local yt-dlp to scan 32+ top Hindi & Global Engineering/Documentary/Business Case-Study channels (including Daily Learn 3.0, HinExp, Paisa Decode, Think School, Nitish Rajput, Branch Education, Animagraffs, MagnatesMedia), calculates outlier multipliers, detects Global-to-Hindi arbitrage opportunities, and outputs high-CTR documentary & 9:16 Short ideas.
 ---
 
-# GMZ Viral Topic Hunter (`v2.0`)
+# GMZ Viral Topic Hunter (`v2.1`)
 
 Use this skill **before picking any new documentary or Short topic** for `GMZ DECODED` so every video rides proven viral psychology instead of random guesses!
 
 ## Dual-Engine Strategy (Engineering + Business Case Studies)
-We track **31 curated channels** across **2 proven high-RPM pillars**:
+We track **32 curated channels** across **2 proven high-RPM pillars**:
 1. **3D Engineering & Megastructures (`@DailyLearn3.0`, `@BranchEducation`, `@Animagraffs`, `@SabinCivil`, `@RealEngineering`, `@TheB1M`, `@MustardChannel`):** Extreme tunnels, jets, microchips, Starlink, underground water & impossible structures.
-2. **Desi & Global Business Case Studies (`@HinExpofficial`, `@ThinkSchool`, `@NitishRajput`, `@AevyTV`, `@Zero1byZerodha`, `@LabourLawAdvisor`, `@MagnatesMedia`, `@Moon-Real`, `@HowMoneyWorks`, `@ModernMBA`):** Nostalgia vehicle/brand paradoxes (*Toyota Qualis `4M`, Hero Honda Split `1.8M`, Big Bazaar `1.1M`*), desi unit economics (*Bus `2.1M`, Petrol Pump `1.2M`, Transport `693K`*), and corporate espionage (*Chinese Spy in Nvidia `496K`*).
+2. **Desi & Global Business Case Studies (`@HinExpofficial`, `@PaisaDecodeHQ`, `@ThinkSchool`, `@NitishRajput`, `@AevyTV`, `@Zero1byZerodha`, `@LabourLawAdvisor`, `@MagnatesMedia`, `@Moon-Real`, `@HowMoneyWorks`, `@ModernMBA`):** Nostalgia vehicle/brand paradoxes (*Toyota Qualis `4M`, Hero Honda Split `1.8M`, Big Bazaar `1.1M`*), ticket-price unit-economics simulations (*Turf `1.4M`, PS5 Café `1.0M`, Petrol Pump `981K–1.2M`, Bus `2.1M`*), and corporate espionage (*Chinese Spy in Nvidia `496K`*).
 - **GMZ Unfair Advantage:** Channels like `HinExp` pull `500K–4M` views using *flat 2D AI illustrations*. Producing those exact high-curiosity topics in **GMZ's `1080p @ 60fps` 3D Google Flow cinema + Foley SFX + Playwright HUD callouts** beats 2D explainers on retention & visual authority!
 
 ---
 
 ## Step 1: Run Automated Outlier Scan (Zero API Key Needed!)
-Scan all **31 curated** Hindi (`13`) & Global (`18`) channels (`~25–40s`):
+Scan all **32 curated** Hindi (`14`) & Global (`18`) channels (`~25–40s`):
 
 ```powershell
 # All 31 channels (Engineering + Business Case Studies)
