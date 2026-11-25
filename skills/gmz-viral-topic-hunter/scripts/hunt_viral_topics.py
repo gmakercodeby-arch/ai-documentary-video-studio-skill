@@ -75,21 +75,33 @@ def fetch_channel_videos(ch: dict, max_items: int, min_dur: int, include_shorts:
 
 def main():
     ap = argparse.ArgumentParser(description="Hunt viral outlier YouTube documentary & Short topics via public yt-dlp feeds.")
-    ap.add_argument("--group", choices=["all", "hindi", "global"], default="all", help="Channel group to scan")
+    ap.add_argument("--group", choices=["all", "hindi", "global", "science", "business"], default="all", help="Channel group to scan")
     ap.add_argument("--max-per-channel", type=int, default=35, help="Recent videos per channel to sample (default 35)")
     ap.add_argument("--min-dur", type=int, default=240, help="Ignore clips shorter than N seconds on /videos (default 240s)")
     ap.add_argument("--min-mult", type=float, default=1.8, help="Minimum outlier multiple over channel median (default 1.8x)")
     ap.add_argument("--min-views", type=int, default=150000, help="Minimum absolute views so small-channel noise doesn't skew top ranks (default 150000)")
     ap.add_argument("--shorts", action="store_true", help="Scan /shorts tabs instead of long-form /videos")
-    ap.add_argument("--workers", type=int, default=6, help="Parallel channel fetch workers")
+    ap.add_argument("--workers", type=int, default=8, help="Parallel channel fetch workers")
     ap.add_argument("--out-dir", required=True, help="Directory to save viral_report.json & viral_report.md")
     args = ap.parse_args()
 
+    all_lists = [
+        CONFIG["channels"]["hindi_leaders"],
+        CONFIG["channels"].get("hindi_business_casestudy", []),
+        CONFIG["channels"]["global_engineering_goldmines"],
+        CONFIG["channels"].get("global_business_casestudy", []),
+    ]
     channels = []
-    if args.group in ("all", "hindi"):
-        channels.extend(CONFIG["channels"]["hindi_leaders"])
-    if args.group in ("all", "global"):
-        channels.extend(CONFIG["channels"]["global_engineering_goldmines"])
+    for lst in all_lists:
+        for ch in lst:
+            if args.group == "all":
+                channels.append(ch)
+            elif args.group == "hindi" and ch["lang"] == "hi":
+                channels.append(ch)
+            elif args.group == "global" and ch["lang"] == "en":
+                channels.append(ch)
+            elif args.group in ("science", "business") and ch.get("category") == args.group:
+                channels.append(ch)
 
     print(f"Scanning {len(channels)} YouTube channels ({'SHORTS' if args.shorts else 'LONG-FORM'}) via yt-dlp...")
     results = []
@@ -144,14 +156,14 @@ def main():
         "mode": "shorts" if args.shorts else "long_form",
         "channels_scanned": len(channel_summaries),
         "channel_medians": sorted(channel_summaries, key=lambda x: -x["median_views"]),
-        "top_outliers": outliers[:60],
+        "top_outliers": outliers[:100],
     }, indent=2, ensure_ascii=False), encoding="utf-8")
 
     md = [f"# GMZ Viral Topic Hunter Report ({'Shorts' if args.shorts else 'Long-Form Documentaries'})\n"]
     md.append(f"Scanned **{len(channel_summaries)} channels**, found **{len(outliers)} breakout outliers (>= {args.min_mult}x channel median)**.\n\n")
-    md.append("## Top 30 Breakout Topics Ranked by GMZ Viral + 3D Visual Score\n")
+    md.append("## Top 40 Breakout Topics Ranked by GMZ Viral + 3D Visual Score\n")
     md.append("| Rank | Mult | Views vs Median | 3D Fit | Lang | Channel | Formula | Title |\n|---:|---:|---:|---:|:---:|---|---|---|\n")
-    for idx, o in enumerate(outliers[:30], 1):
+    for idx, o in enumerate(outliers[:40], 1):
         v_str = f"{o['views']:,} vs {o['median_views']:,}"
         md.append(f"| {idx} | **{o['multiplier']:.1f}x** | {v_str} | {o['cinema_3d_score']}/10 | `{o['lang']}` | {o['channel']} | {o['formula']} | [{o['title'][:75]}]({o['url']}) |\n")
 

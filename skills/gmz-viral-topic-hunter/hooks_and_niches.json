@@ -1,42 +1,71 @@
 {
   "channels": {
     "hindi_leaders": [
-      {"name": "Daily Learn 3.0", "url": "https://www.youtube.com/@DailyLearn3.0/videos", "lang": "hi", "note": "Primary direct benchmark (3D Hindi documentaries)"},
-      {"name": "GetsetflySCIENCE", "url": "https://www.youtube.com/@GetSetFly/videos", "lang": "hi", "note": "Hindi science & mystery storytelling"},
-      {"name": "Gaurav Thakur", "url": "https://www.youtube.com/@GauravThakur-GSF/videos", "lang": "hi", "note": "Deep geopolitics, tech & mega-systems"},
-      {"name": "FactTechz", "url": "https://www.youtube.com/@FactTechz/videos", "lang": "hi", "note": "High-CTR Hindi science & engineering mysteries"},
-      {"name": "CuriousPlus", "url": "https://www.youtube.com/@CuriousPlus/videos", "lang": "hi", "note": "Viral Hindi explainer storytelling"},
-      {"name": "ZemTV", "url": "https://www.youtube.com/@ZemTV.Official/videos", "lang": "hi", "note": "Urdu/Hindi high-retention documentaries"}
+      {"name": "Daily Learn 3.0", "url": "https://www.youtube.com/@DailyLearn3.0/videos", "lang": "hi", "category": "science", "note": "Primary direct benchmark (3D Hindi engineering & megastructure docs)"},
+      {"name": "GetsetflySCIENCE", "url": "https://www.youtube.com/@GetSetFly/videos", "lang": "hi", "category": "science", "note": "Hindi science & space/deep-sea mysteries"},
+      {"name": "Gaurav Thakur", "url": "https://www.youtube.com/@GauravThakur-GSF/videos", "lang": "hi", "category": "science", "note": "Geopolitics, megaprojects & deep science"},
+      {"name": "FactTechz", "url": "https://www.youtube.com/@FactTechz/videos", "lang": "hi", "category": "science", "note": "High-CTR Hindi science & engineering mysteries"},
+      {"name": "CuriousPlus", "url": "https://www.youtube.com/@CuriousPlus/videos", "lang": "hi", "category": "science", "note": "Viral Hindi explainer storytelling"},
+      {"name": "ZemTV", "url": "https://www.youtube.com/@ZemTV.Official/videos", "lang": "hi", "category": "science", "note": "Urdu/Hindi high-retention documentaries"}
+    ],
+    "hindi_business_casestudy": [
+      {"name": "HinExp", "url": "https://www.youtube.com/@HinExpofficial/videos", "lang": "hi", "category": "business", "note": "Top Hindi AI-illustrated business case studies (Qualis 4M, Bus 2.1M, Hero Honda 1.8M, Petrol Pump 1.2M, Nvidia Spy 496K)"},
+      {"name": "Think School", "url": "https://www.youtube.com/@ThinkSchool/videos", "lang": "hi", "category": "business", "note": "India's top business, brand & geopolitics case studies"},
+      {"name": "Aevy TV", "url": "https://www.youtube.com/@AevyTV/videos", "lang": "hi", "category": "business", "note": "Cinematic Indian industry, startup & economy deep-dives"},
+      {"name": "Nitish Rajput", "url": "https://www.youtube.com/@NitishRajput/videos", "lang": "hi", "category": "business", "note": "Massive Hindi analytical documentaries on scams, brands & systems"},
+      {"name": "Soch by Mohak Mangal", "url": "https://www.youtube.com/@mohak_mangal/videos", "lang": "hi", "category": "business", "note": "High-retention India economics & policy storytelling"},
+      {"name": "Zero1 by Zerodha", "url": "https://www.youtube.com/@Zero1byZerodha/videos", "lang": "hi", "category": "business", "note": "Middle-class money traps, real estate & finance math"},
+      {"name": "Labour Law Advisor", "url": "https://www.youtube.com/@LabourLawAdvisor/videos", "lang": "hi", "category": "business", "note": "Desi business unit economics, scams & middle-class reality"}
     ],
     "global_engineering_goldmines": [
-      {"name": "Real Engineering", "url": "https://www.youtube.com/@RealEngineering/videos", "lang": "en", "note": "Insane aviation, submarines, energy & tech breakdowns"},
-      {"name": "Mustard", "url": "https://www.youtube.com/@MustardChannel/videos", "lang": "en", "note": "Ultra-cinematic obscure planes, trains & ships 3D docs"},
-      {"name": "Branch Education", "url": "https://www.youtube.com/@BranchEducation/videos", "lang": "en", "note": "3D X-ray inside GPUs, batteries, cameras & phones"},
-      {"name": "Sabin Civil", "url": "https://www.youtube.com/@SabinCivil/videos", "lang": "en", "note": "Mega bridges, dams, tunnels & civil marvels (Indian roots!)"},
-      {"name": "Sabin Mechanical", "url": "https://www.youtube.com/@SabinMechanical/videos", "lang": "en", "note": "How machines, engines & motors actually work inside"},
-      {"name": "Wendover Productions", "url": "https://www.youtube.com/@Wendoverproductions/videos", "lang": "en", "note": "Logistics, aviation routes, hidden infrastructure economics"},
-      {"name": "Fern", "url": "https://www.youtube.com/@fern-tv/videos", "lang": "en", "note": "Dark 3D animated investigations & mysteries"},
-      {"name": "Veritasium", "url": "https://www.youtube.com/@veritasium/videos", "lang": "en", "note": "Mind-bending physics paradoxes & breakthroughs"},
-      {"name": "RealLifeLore", "url": "https://www.youtube.com/@RealLifeLore/videos", "lang": "en", "note": "Mega-geography, borders & geopolitical resources"},
-      {"name": "ColdFusion", "url": "https://www.youtube.com/@ColdFusion/videos", "lang": "en", "note": "Tech empires, hidden factories, billion-dollar flops"},
-      {"name": "The B1M", "url": "https://www.youtube.com/@TheB1M/videos", "lang": "en", "note": "World's craziest megaprojects, skyscrapers & tunnels"},
-      {"name": "Animagraffs", "url": "https://www.youtube.com/@Animagraffs/videos", "lang": "en", "note": "Pure 3D cutaway animations of engines, ships & military jets"},
-      {"name": "Practical Engineering", "url": "https://www.youtube.com/@PracticalEngineeringChannel/videos", "lang": "en", "note": "Dams, sinkholes, power grids & civil failures"}
+      {"name": "Real Engineering", "url": "https://www.youtube.com/@RealEngineering/videos", "lang": "en", "category": "science", "note": "Insane aviation, submarines, energy & stealth tech breakdowns"},
+      {"name": "Mustard", "url": "https://www.youtube.com/@MustardChannel/videos", "lang": "en", "category": "science", "note": "Ultra-cinematic obscure planes, trains & ships 3D docs"},
+      {"name": "Branch Education", "url": "https://www.youtube.com/@BranchEducation/videos", "lang": "en", "category": "science", "note": "3D X-ray inside GPUs, CPUs, Starlink & batteries"},
+      {"name": "Sabin Civil", "url": "https://www.youtube.com/@SabinCivil/videos", "lang": "en", "category": "science", "note": "Mega bridges, dams, tunnels & civil marvels"},
+      {"name": "Sabin Mechanical", "url": "https://www.youtube.com/@SabinMechanical/videos", "lang": "en", "category": "science", "note": "How engines, ships & machines actually work inside"},
+      {"name": "Wendover Productions", "url": "https://www.youtube.com/@Wendoverproductions/videos", "lang": "en", "category": "science", "note": "Logistics, aviation routes & hidden infrastructure economics"},
+      {"name": "Fern", "url": "https://www.youtube.com/@fern-tv/videos", "lang": "en", "category": "science", "note": "Dark 3D animated investigations & mysteries"},
+      {"name": "Veritasium", "url": "https://www.youtube.com/@veritasium/videos", "lang": "en", "category": "science", "note": "Mind-bending physics paradoxes & EUV chip breakthroughs"},
+      {"name": "RealLifeLore", "url": "https://www.youtube.com/@RealLifeLore/videos", "lang": "en", "category": "science", "note": "Mega-geography, borders & geopolitical resources"},
+      {"name": "ColdFusion", "url": "https://www.youtube.com/@ColdFusion/videos", "lang": "en", "category": "science", "note": "Tech empires, hidden factories & billion-dollar flops"},
+      {"name": "The B1M", "url": "https://www.youtube.com/@TheB1M/videos", "lang": "en", "category": "science", "note": "World's craziest megaprojects, airports & skyscrapers"},
+      {"name": "Animagraffs", "url": "https://www.youtube.com/@Animagraffs/videos", "lang": "en", "category": "science", "note": "Pure 3D cutaway animations of jets, engines & submarines"},
+      {"name": "Practical Engineering", "url": "https://www.youtube.com/@PracticalEngineeringChannel/videos", "lang": "en", "category": "science", "note": "Dams, sinkholes, power grids & civil failures"}
+    ],
+    "global_business_casestudy": [
+      {"name": "MagnatesMedia", "url": "https://www.youtube.com/@MagnatesMedia/videos", "lang": "en", "category": "business", "note": "Cinematographic rise-and-fall corporate empires & frauds (global benchmark for HinExp style)"},
+      {"name": "Moon", "url": "https://www.youtube.com/@Moon-Real/videos", "lang": "en", "category": "business", "note": "Dark corporate exposés, anti-consumer empires & tech collapses"},
+      {"name": "How Money Works", "url": "https://www.youtube.com/@HowMoneyWorks/videos", "lang": "en", "category": "business", "note": "High-RPM global industry economics & hidden business models"},
+      {"name": "Modern MBA", "url": "https://www.youtube.com/@ModernMBA/videos", "lang": "en", "category": "business", "note": "Deep unit economics of why famous businesses win or bleed money"},
+      {"name": "Johnny Harris", "url": "https://www.youtube.com/@johnnyharris/videos", "lang": "en", "category": "business", "note": "Map-driven geopolitical, trade & corporate investigations"}
     ]
   },
   "title_formulas": [
+    {"name": "Why Brand Killed Its Hit / Downfall", "patterns": ["killed", "how .* died", "crashed", "split", "left india", "fall of", "destroyed", "dying", "खत्म", "डूब", "क्यों बंद", "बर्बाद"]},
+    {"name": "Desi Unit Economics / Profit Reality", "patterns": ["economics of", "owning a", "business behind", "system in \\d+", "makes? .* money", "kitna kamata", "कितना कमाता", "बिज़नेस", "मुनाफा", "करोड़"]},
+    {"name": "Corporate Spy / Dark Truth Exposed", "patterns": ["\\bspy\\b", "scandal", "dark truth", "nobody saw", "secret", "steal", "fraud", "scam", "खेल", "राज़", "सच", "धोखा"]},
     {"name": "Impossible Engineering / Physics Paradox", "patterns": ["\\bimpossible\\b", "how .* work", "actually works", "insane engineering", "defies physics", "कैसे", "असंभव", "नामुमकिन"]},
     {"name": "Inside X-Ray / Hidden Factory Reveal", "patterns": ["\\binside\\b", "how .* made", "factory", "underwater", "underground", "बनाया", "अंदर", "कारखाना", "फैक्ट्री"]},
-    {"name": "Absurd Money / Cost Scale", "patterns": ["\\$\\d", "billion", "million", "expensive", "worth", "crore", "करोड़", "अरब", "महंगा", "बिज़नेस"]},
+    {"name": "Absurd Money / Cost Scale", "patterns": ["\\$\\d", "billion", "million", "expensive", "worth", "crore", "₹", "करोड़", "अरब", "महंगा"]},
     {"name": "Silent Failure / Disaster Investigation", "patterns": ["why .* failed", "disaster", "stopped", "abandoned", "crash", "mystery", "फेल", "तबाह", "बंद", "रहस्य"]},
-    {"name": "Why Nobody / Only 1 Country Can Build It", "patterns": ["why only", "nobody", "no one", "banned", "secret", "सिर्फ", "अकेला", "कोई नहीं", "राज़"]},
-    {"name": "Mega Project / Extreme Frontier", "patterns": ["largest", "biggest", "deepest", "fastest", "tallest", "सबसे बड़ा", "दुनिया का सबसे", "गहरा", "ऊंचा"]},
-    {"name": "Vs / Old Tech Destroyed By New Tech", "patterns": ["\\bvs\\b", "killed", "replaced", "future of", "end of", "खत्म", "मुकाबला"]}
+    {"name": "Why Nobody / Only 1 Country Can Build It", "patterns": ["why only", "nobody", "no one", "banned", "सिर्फ", "अकेला", "कोई नहीं"]},
+    {"name": "Mega Project / Extreme Frontier", "patterns": ["largest", "biggest", "deepest", "fastest", "tallest", "सबसे बड़ा", "दुनिया का सबसे", "गहरा", "ऊंचा"]}
   ],
   "cinema_3d_keywords": [
     "plane", "aircraft", "jet", "rocket", "space", "submarine", "ship", "bridge", "tunnel", "dam", "nuclear",
     "battery", "chip", "gpu", "semiconductor", "engine", "turbine", "train", "bullet", "hyperloop", "robot",
     "factory", "mine", "vault", "bunker", "satellite", "laser", "reactor", "oil", "rig", "airport", "skyscraper",
-    "विमान", "रॉकेट", "जहाज", "सुरंग", "फैक्ट्री", "इंजन", "बैटरी", "बांध", "सैटेलाइट", "सबमरीन", "पुल"
+    "car", "toyota", "qualis", "tata", "honda", "hero", "bajaj", "suzuki", "tavera", "bus", "truck", "petrol",
+    "hotel", "mall", "bazaar", "nvidia", "spy", "bank", "empire", "warehouse", "delivery", "swiggy", "zomato",
+    "विमान", "रॉकेट", "जहाज", "सुरंग", "फैक्ट्री", "इंजन", "बैटरी", "बांध", "सैटेलाइट", "सबमरीन", "पुल", "कार", "पेट्रोल", "कंपनी"
+  ],
+  "proven_viral_archetypes_hi": [
+    "Nostalgic Indian Car/Vehicle Killed at Peak (e.g. Qualis 4.0M, Tavera 1.1M, Nano, Contessa, Gypsy, Ambassador, Kinetic Honda, Rajdoot)",
+    "Legendary Indian Joint-Venture / Family Split (e.g. Hero Honda 1.8M, TVS Split 425K, Bajaj-Kawasaki, Maruti-Suzuki early war, Raymond)",
+    "Indian Retail / Startup Crash vs Desi Giant (e.g. Big Bazaar 1.1M, Balaji vs Lays 456K, DMart 704K, Sugar Cosmetics 879K, Byju's, Dunzo)",
+    "Aam Aadmi High-Capital Unit Economics (e.g. Bus Business 2.1M, Petrol Pump 1.2M, Truck/Transport 693K, 5-Star Hotel 518K, Airport Duty-Free, Cold Storage)",
+    "Global AI / Chip War & Corporate Espionage (e.g. Chinese Spy in Nvidia 496K, TSMC Taiwan Chokehold, ASML 100Cr Laser, Starlink)",
+    "Middle-Class Money Traps & Crowd Psychology (e.g. 7 Shop Psychology Tricks 1.3M, Rent vs Buy Home Math 1.2M, Two Salaries Trap 743K)",
+    "Impossible Megastructures & Physics Paradoxes (e.g. Burj Khalifa 163rd Floor Water 2.4M, Channel Tunnel 5.8M, Saudi Oil-to-Water 1.6M)"
   ]
 }
