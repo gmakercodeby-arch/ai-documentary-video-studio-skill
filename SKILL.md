@@ -169,3 +169,14 @@ python "<SKILL_DIR>/scripts/preflight_qa.py" --acts project/acts.json --audio pr
      - Verify zero spoken audio glitches/rogue words, zero watermarks, zero edge borders, zero AI voice bleed, zero dead silence, zero A/V sync drift.
      - Verify **Literal Sentence-by-Sentence Spoken-vs-Visual Alignment**, exact overlay & Outro CTA timing, and zero background wardrobe/currency/AI artifacts.
    - **Mandatory Auto-Fix Before Delivery:** If ANY defect is spotted in ANY chunk, **FIX IT IMMEDIATELY** (patch audio / remap `shot_plan.json` / adjust overlay timestamp), re-render via SHA-1 clip cache, rebuild affected proxies, and re-verify to 100% clean BEFORE delivering the final video!
+
+---
+
+## 7. Stage 6 — Viral 9:16 Companion Short Standard (`v5.5` — Fast `40–45s`, Zero Black Bars!)
+
+Every long-form documentary ships with a `1080×1920 @ 30fps` companion Short engineered to feed viewers straight to the full video:
+1. **Fast Energetic Narrator Delivery (`185–210 WPM`):** Lock the exact same TTS voice (`gemini-3.1-flash-tts-preview` / `Fenrir`) with an energetic Shorts pacing prompt, `silenceremove` tight breath trimming, and `faster-whisper` word alignment (`0` slow drags).
+2. **18–20 Ultra-Fast Cuts (`1.45s–3.1s`, Literal Word-to-Visual Match):** Blend `3` native `9:16` Flow vertical hero clips (`crop 88%` at `x=0, y=ih*0.04` to strip Flow watermarks & top-edge artifacts) with `10+` blurred Motion Bokeh `16:9` proof sub-beats (`gblur=sigma=28`, thin gold/cyan border — NEVER ugly flat black bars).
+3. **Multi-Layered Cinema Audio (`-14.0 LUFS`):** Pair `12–15` frame-exact SFX (`sub-bass hit` at `0ms`, `coin_hit`, `whoosh`, `pop`, `riser` into CTA) with `sidechaincompress` ducked BGM.
+4. **Clean HUDs & Non-Colliding Captions:** Temporary `0–2.55s` Opening Hook Flash + 2 floating `2.5–5s` Playwright metric cards + top-right `• BRAND` glass pill + 1–2 word ASS pop captions (`Spacing=0`, `MarginV=405`) safely above a bottom-left CTA pill (`bottom=235px`).
+5. **Mandatory Pre-Delivery Watch & Listen QA:** Always build a `3×3` storyboard + lightweight `qa_proxy.mp4`, inspect every tile & listen end-to-end, and surgically trim any whip-pan motion blur, stray emblems, or watermark glitches before shipping!

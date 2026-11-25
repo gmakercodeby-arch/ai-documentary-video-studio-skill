@@ -78,9 +78,11 @@ This workspace (`f:\Daily Learn 3.0`) produces **10–18 minute 16:9 @ 60fps Hin
   - **Next scheduled slot:** `7 Dec 2026, 17:45 IST` (every 3 days).
 - **GitHub Skill Repo (Synced at v5.3):** `https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill` (local sync folder: `f:\Daily Learn 3.0\_gh_skill_sync\ai-documentary-video-studio-skill`)
 
-## v5.4 Upgrade — 97%-Video Sub-Beat Lock & Full-Screen 9:16 Viral Tech Shorts (Locked)
+## v5.5 Upgrade (LOCKED) — Proven Petrol-Pump Viral 9:16 Short Standard (`1080×1920 @ 30fps`, `40–45s`)
 - **97%-Video Documentary Mode:** Audit every Flow clip via 5-frame sub-beat strip (`veo_subbeats_grid.png`), lock clean `[win_start, win_end]` windows to trim AI morphs/props, force-pin matching hero clips to kinetic overlays (`FORCE_OVERLAY_CLIP`), and run a strict `<3` cooldown post-pass (`0` violations).
-- **Full-Screen 9:16 Tech/AI Shorts (NEVER Movie-Recap Black Bars!):**
-  - Generate native `9:16` Flow clips (`aspect="9:16"`, `crop 88%` top-left to erase Flow diamond) for full-bleed `1080×1920` immersion; frame any `16:9` contrast shots inside a **Blurred Motion Bokeh Background** (`gblur=sigma=28`).
-  - **Zero permanent top banner boxes:** Use a temporary `0–2.65s` kinetic hook + floating 2.5s spec badges, **multi-layered cinema SFX** (`sub-bass hit`, `whoosh`, `zap`, `riser`, `pop`), **Whisper word-locked Devanagari ASS captions** (`Spacing=0`, `MarginV=405`, `0` overlap with `bottom: 235px` CTA pill), and a **Curiosity-Gap CTA** driving clicks to the 16:9 master.
-  - **FFmpeg Short Stability:** Enforce even crop dimensions (`trunc(.../2)*2`), `-video_track_timescale 30000`, and re-encoded concat (`libx264`) instead of `-c copy`.
+- **Mandatory Short Production Bar (`GMZ_Petrol_Pump_Short_42s.mp4` Blueprint — NEVER Drop Below This Quality):**
+  - **Fast Energetic Fenrir Delivery (`185–210 WPM`):** Lock `gemini-3.1-flash-tts-preview` (`Fenrir`) with energetic Shorts pacing prompt + `silenceremove` tight pause trim + Whisper word alignment (`0` dead gaps — never use slow documentary cadence on Shorts!).
+  - **18–20 Ultra-Fast Cuts (`1.45s–3.1s`, Literal Word-to-Visual Lock):** Combine `3` native `9:16` Google Flow clips (`720p`, crop `88%` at `x=0, y=ih*0.04` to strip watermarks + top-edge artifacts) with `10+` blurred Motion Bokeh `16:9` hero proof sub-beats (`gblur=sigma=28`, zero black bars). Every spoken metaphor (*chai/samosa, coin waterfall, evaporation mist, motor oil, ATM, 7 padlocks*) gets its exact visual!
+  - **Multi-Layered SFX + Broadcast Mix (`-14.0 to -14.7 LUFS`):** `12–15` timed SFX events (`sfx_bass_hit` at `0ms`, `sfx_coin_hit`, `sfx_whoosh`, `sfx_pop`, `sfx_riser` into CTA) + sidechain-ducked BGM (`LRA ~2.0–3.5 LU`).
+  - **Clean Non-Colliding HUDs & Devanagari ASS:** Temporary `0–2.55s` Hook Flash, 2 floating metric cards (`y=210px`), top-right `• GMZ` glass pill, Whisper-locked 1–2 word Devanagari ASS pop captions (`Spacing=0`, `MarginV=405`), and bottom-left CTA pill (`bottom=235px`, `0` caption collision).
+  - **Zero-Defect Watch & Listen Before Delivery:** Always scrub 5-frame strips + render `3x3` QA & `qa_proxy.mp4`, surgically trimming whip-pan blurs, foreign currency, or stray emblems before shipping (`trunc(.../2)*2`, `-video_track_timescale 30000`, re-encoded concat).
