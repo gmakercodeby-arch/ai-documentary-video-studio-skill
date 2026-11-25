@@ -211,6 +211,11 @@ ai-documentary-video-studio-skill/
     ├── preflight_qa.py               # Layer-1 QA: Asset grids, voice forensics, diversity & reuse gate
     ├── assemble_documentary.py       # GPU + Multi-Core + SHA-1 Cached 1080p@60fps FFmpeg Assembler
     └── make_qa_proxy.py              # Layer-2 QA: 2-min multimodal Watch & Listen proxy builder
+└── skills/
+    └── gmz-viral-topic-hunter/       # Companion Skill: 19-Channel yt-dlp Outlier & Arbitrage Hunter
+        ├── SKILL.md
+        ├── hooks_and_niches.json
+        └── scripts/hunt_viral_topics.py
 ```
 
 </details>

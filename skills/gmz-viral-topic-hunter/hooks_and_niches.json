@@ -1,0 +1,42 @@
+{
+  "channels": {
+    "hindi_leaders": [
+      {"name": "Daily Learn 3.0", "url": "https://www.youtube.com/@DailyLearn3.0/videos", "lang": "hi", "note": "Primary direct benchmark (3D Hindi documentaries)"},
+      {"name": "GetsetflySCIENCE", "url": "https://www.youtube.com/@GetSetFly/videos", "lang": "hi", "note": "Hindi science & mystery storytelling"},
+      {"name": "Gaurav Thakur", "url": "https://www.youtube.com/@GauravThakur-GSF/videos", "lang": "hi", "note": "Deep geopolitics, tech & mega-systems"},
+      {"name": "FactTechz", "url": "https://www.youtube.com/@FactTechz/videos", "lang": "hi", "note": "High-CTR Hindi science & engineering mysteries"},
+      {"name": "CuriousPlus", "url": "https://www.youtube.com/@CuriousPlus/videos", "lang": "hi", "note": "Viral Hindi explainer storytelling"},
+      {"name": "ZemTV", "url": "https://www.youtube.com/@ZemTV.Official/videos", "lang": "hi", "note": "Urdu/Hindi high-retention documentaries"}
+    ],
+    "global_engineering_goldmines": [
+      {"name": "Real Engineering", "url": "https://www.youtube.com/@RealEngineering/videos", "lang": "en", "note": "Insane aviation, submarines, energy & tech breakdowns"},
+      {"name": "Mustard", "url": "https://www.youtube.com/@MustardChannel/videos", "lang": "en", "note": "Ultra-cinematic obscure planes, trains & ships 3D docs"},
+      {"name": "Branch Education", "url": "https://www.youtube.com/@BranchEducation/videos", "lang": "en", "note": "3D X-ray inside GPUs, batteries, cameras & phones"},
+      {"name": "Sabin Civil", "url": "https://www.youtube.com/@SabinCivil/videos", "lang": "en", "note": "Mega bridges, dams, tunnels & civil marvels (Indian roots!)"},
+      {"name": "Sabin Mechanical", "url": "https://www.youtube.com/@SabinMechanical/videos", "lang": "en", "note": "How machines, engines & motors actually work inside"},
+      {"name": "Wendover Productions", "url": "https://www.youtube.com/@Wendoverproductions/videos", "lang": "en", "note": "Logistics, aviation routes, hidden infrastructure economics"},
+      {"name": "Fern", "url": "https://www.youtube.com/@fern-tv/videos", "lang": "en", "note": "Dark 3D animated investigations & mysteries"},
+      {"name": "Veritasium", "url": "https://www.youtube.com/@veritasium/videos", "lang": "en", "note": "Mind-bending physics paradoxes & breakthroughs"},
+      {"name": "RealLifeLore", "url": "https://www.youtube.com/@RealLifeLore/videos", "lang": "en", "note": "Mega-geography, borders & geopolitical resources"},
+      {"name": "ColdFusion", "url": "https://www.youtube.com/@ColdFusion/videos", "lang": "en", "note": "Tech empires, hidden factories, billion-dollar flops"},
+      {"name": "The B1M", "url": "https://www.youtube.com/@TheB1M/videos", "lang": "en", "note": "World's craziest megaprojects, skyscrapers & tunnels"},
+      {"name": "Animagraffs", "url": "https://www.youtube.com/@Animagraffs/videos", "lang": "en", "note": "Pure 3D cutaway animations of engines, ships & military jets"},
+      {"name": "Practical Engineering", "url": "https://www.youtube.com/@PracticalEngineeringChannel/videos", "lang": "en", "note": "Dams, sinkholes, power grids & civil failures"}
+    ]
+  },
+  "title_formulas": [
+    {"name": "Impossible Engineering / Physics Paradox", "patterns": ["\\bimpossible\\b", "how .* work", "actually works", "insane engineering", "defies physics", "कैसे", "असंभव", "नामुमकिन"]},
+    {"name": "Inside X-Ray / Hidden Factory Reveal", "patterns": ["\\binside\\b", "how .* made", "factory", "underwater", "underground", "बनाया", "अंदर", "कारखाना", "फैक्ट्री"]},
+    {"name": "Absurd Money / Cost Scale", "patterns": ["\\$\\d", "billion", "million", "expensive", "worth", "crore", "करोड़", "अरब", "महंगा", "बिज़नेस"]},
+    {"name": "Silent Failure / Disaster Investigation", "patterns": ["why .* failed", "disaster", "stopped", "abandoned", "crash", "mystery", "फेल", "तबाह", "बंद", "रहस्य"]},
+    {"name": "Why Nobody / Only 1 Country Can Build It", "patterns": ["why only", "nobody", "no one", "banned", "secret", "सिर्फ", "अकेला", "कोई नहीं", "राज़"]},
+    {"name": "Mega Project / Extreme Frontier", "patterns": ["largest", "biggest", "deepest", "fastest", "tallest", "सबसे बड़ा", "दुनिया का सबसे", "गहरा", "ऊंचा"]},
+    {"name": "Vs / Old Tech Destroyed By New Tech", "patterns": ["\\bvs\\b", "killed", "replaced", "future of", "end of", "खत्म", "मुकाबला"]}
+  ],
+  "cinema_3d_keywords": [
+    "plane", "aircraft", "jet", "rocket", "space", "submarine", "ship", "bridge", "tunnel", "dam", "nuclear",
+    "battery", "chip", "gpu", "semiconductor", "engine", "turbine", "train", "bullet", "hyperloop", "robot",
+    "factory", "mine", "vault", "bunker", "satellite", "laser", "reactor", "oil", "rig", "airport", "skyscraper",
+    "विमान", "रॉकेट", "जहाज", "सुरंग", "फैक्ट्री", "इंजन", "बैटरी", "बांध", "सैटेलाइट", "सबमरीन", "पुल"
+  ]
+}

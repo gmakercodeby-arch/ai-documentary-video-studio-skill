@@ -4,6 +4,7 @@ This workspace (`f:\Daily Learn 3.0`) produces **10–18 minute 16:9 @ 60fps Hin
 
 ## Always Activate
 - Global Skill: `daily-learn-doc-studio` (`C:\Users\shahz\.gemini\config\skills\daily-learn-doc-studio\SKILL.md`)
+- Global Topic Discovery Skill: `gmz-viral-topic-hunter` (`C:\Users\shahz\.gemini\config\skills\gmz-viral-topic-hunter\SKILL.md`) — ALWAYS run BEFORE picking a new documentary/Short topic to mine 19 Hindi & Global benchmark channels via `yt-dlp` outlier multipliers & Global-to-Hindi arbitrage (`--min-views 150000` long-form / `500000` shorts).
 - Reference forensic study files: `f:\Daily Learn 3.0\reference_study\`
 - Local API key: `f:\Daily Learn 3.0\.env` (`GEMINI_API_KEY` + backup keys preserved as comments)
 

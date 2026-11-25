@@ -31,6 +31,19 @@ for EXTRA_ROOT in "$HOME/.claude" "$HOME/.cursor"; do
   fi
 done
 
+# Also install bundled companion skill: gmz-viral-topic-hunter
+HUNTER_SRC="$PRIMARY/skills/gmz-viral-topic-hunter"
+if [ -d "$HUNTER_SRC" ]; then
+  for HUNTER_ROOT in "$HOME/.gemini/config" "$HOME/.claude" "$HOME/.cursor"; do
+    if [ -d "$HUNTER_ROOT" ] || [ "$HUNTER_ROOT" = "$HOME/.gemini/config" ]; then
+      mkdir -p "$HUNTER_ROOT/skills"
+      rm -rf "$HUNTER_ROOT/skills/gmz-viral-topic-hunter"
+      cp -R "$HUNTER_SRC" "$HUNTER_ROOT/skills/gmz-viral-topic-hunter"
+    fi
+  done
+  echo "      Installed companion skill: gmz-viral-topic-hunter"
+fi
+
 echo "[2/3] Installing Python dependencies..."
 PY_BIN=$(command -v python3 || command -v python)
 "$PY_BIN" -m pip install --upgrade -r "$PRIMARY/requirements.txt"
