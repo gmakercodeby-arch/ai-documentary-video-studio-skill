@@ -1,8 +1,8 @@
-﻿"""
-GMZ Documentary Studio v5.0 â€” Cinema Documentary Style Kinetic Typography, HUD Pointer & Split-Screen Overlay Renderer
+"""
+GMZ Documentary Studio v5.0 — Daily Learn 3.0 Style Kinetic Typography, HUD Pointer & Split-Screen Overlay Renderer
 Replaces boring static blueprint slides with broadcast-grade transparent 1920x1080 PNG overlays
 that composite directly ON TOP of moving Veo 3.1 / 3D cinema footage:
-  - mode="impact"  : Giant bold Hindi/English impact text with cinema drop shadow & subtle glow (e.g. "à¤¸à¤¨à¥à¤¨à¤¾à¤Ÿà¤¾à¥¤", "500 FEET")
+  - mode="impact"  : Giant bold Hindi/English impact text with cinema drop shadow & subtle glow (e.g. "सन्नाटा।", "500 FEET")
   - mode="hud"     : Thin glowing white/cyan technical HUD pointer line + floating label pointing at the subject
   - mode="split"   : Vertical glowing split-screen divider with bold Left vs Right headers ("1. PROBLEM" | "2. SOLUTION")
   - mode="cta"     : Sleek translucent gold glassmorphism 1-Click Website Outro CTA card
@@ -24,18 +24,24 @@ def make_overlay_html(item: dict) -> str:
         pos = item.get("position", "center")  # center | bottom | top
         align_css = (
             "align-items:center; justify-content:center;" if pos == "center"
-            else ("align-items:flex-end; justify-content:center; padding-bottom:130px;" if pos == "bottom"
+            else ("align-items:flex-end; justify-content:center; padding-bottom:112px;" if pos == "bottom"
                   else "align-items:flex-start; justify-content:center; padding-top:90px;")
+        )
+        t_sz = 104 if len(title) <= 18 else (82 if len(title) <= 26 else 70)
+        wrap_bg = (
+            f"background:rgba(5,10,22,0.74);backdrop-filter:blur(8px);padding:20px 44px;border-radius:22px;"
+            f"border:1.5px solid {accent}77;box-shadow:0 20px 54px rgba(0,0,0,0.8);"
+            if pos == "bottom" else ""
         )
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><style>
           *{{margin:0;padding:0;box-sizing:border-box;}}
           body{{width:1920px;height:1080px;background:transparent;display:flex;{align_css}
                font-family:'Nirmala UI','Segoe UI','Noto Sans Devanagari',Arial,sans-serif;}}
-          .wrap{{text-align:center;max-width:1600px;}}
-          .main{{font-size:108px;font-weight:900;color:#FFFFFF;letter-spacing:2px;line-height:1.12;
+          .wrap{{text-align:center;max-width:1660px;{wrap_bg}}}
+          .main{{font-size:{t_sz}px;font-weight:900;color:#FFFFFF;letter-spacing:2px;line-height:1.12;
                 text-shadow:0 8px 32px rgba(0,0,0,0.95), 0 0 42px {accent}88, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000;}}
-          .sub{{margin-top:16px;font-size:38px;font-weight:800;color:{accent};letter-spacing:3px;text-transform:uppercase;
-               text-shadow:0 4px 18px rgba(0,0,0,0.95);}}
+          .sub{{margin-top:12px;font-size:34px;font-weight:800;color:{accent};letter-spacing:3px;text-transform:uppercase;
+               text-shadow:0 4px 16px rgba(0,0,0,0.98), -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;}}
         </style></head><body><div class="wrap"><div class="main">{title}</div>
         {f'<div class="sub">{subtitle}</div>' if subtitle else ''}</div></body></html>"""
 
@@ -103,7 +109,7 @@ def make_overlay_html(item: dict) -> str:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Render v5.0 Cinema Documentary style kinetic text, HUD pointers & split-screen overlays.")
+    ap = argparse.ArgumentParser(description="Render v5.0 Daily Learn 3.0 style kinetic text, HUD pointers & split-screen overlays.")
     ap.add_argument("--specs-json", required=True, help="JSON list of overlay specs [{'file':'k01.png','mode':'impact','title':'...'}]")
     ap.add_argument("--out-dir", required=True, help="Output folder for transparent 1920x1080 PNGs")
     args = ap.parse_args()
@@ -129,4 +135,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

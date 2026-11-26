@@ -1,11 +1,11 @@
 <div align="center">
 
 <!-- Animated Cyber-Neon Header Banner -->
-<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0B1120,45:6D28D9,100:06B6D4&height=230&section=header&text=AI%20DOCUMENTARY%20STUDIO&fontSize=44&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=v5.3%20Bulletproof%20Zero-Defect%20Cinema%20%E2%80%A2%20EOF%20Shield%20%2B%20Auto-Fix%20QA%20%2B%201080p60&descAlignY=62&descSize=16&descColor=FACC15" alt="AI Documentary Video-Making Studio v5.3 Banner" />
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0B1120,45:6D28D9,100:06B6D4&height=230&section=header&text=AI%20DOCUMENTARY%20STUDIO&fontSize=44&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=v6.4%20Zero-Repeat%20Cinema%20%E2%80%A2%20Motion%20Shards%20%2B%20EOF%20Shield%20%2B%20YouTube%20CTR&descAlignY=62&descSize=16&descColor=FACC15" alt="AI Documentary Video-Making Studio v6.4 Banner" />
 
 <!-- Animated Neon Typing Tagline -->
 <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
-  <img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=700&size=19&duration=2600&pause=700&color=38BDF8&center=true&vCenter=true&width=820&lines=Multi-Beat+Omni+1.2+Flash+%26+Veo+3.1+(Smart+360p%2F720p+Credit+Saver);v5.3+Video+EOF+Shield+%26+Auto-Clamp+(0.000s+Drift+%26+Zero+Black+Frames);Auto+TTS+Hallucination+Scanner+%26+Static-Slide+Blocker;Hardware+GPU+(QSV%2FNVENC)+%2B+SHA-1+Smart+Caching;100%25+Full-Video+Watch+%26+Listen+%2B+Black-Frame+Proxy+Detector" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Orbitron&weight=700&size=19&duration=2600&pause=700&color=38BDF8&center=true&vCenter=true&width=820&lines=v6.4+Cinema-First+75-80%25+Veo+Lite+%26+Omni+1.2+(Smart+Credit+Control);6x+Sharded+1080p60+Playwright+Motion+%2B+Frosted+Callouts+(0.000s+Drift);v5.3+Video+EOF+Shield+%2B+Callout+Mtime+Cache-Bust+%26+TTS+Scanner;YouTube+Studio+CTR+Audit+%2B+9%3A16+Viral+Shorts+Blueprint;100%25+Full-Video+Watch+%26+Listen+%2B+Black-Frame+Proxy+Detector" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -13,7 +13,7 @@
 <!-- Primary Pro Badges -->
 <p align="center">
   <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
-    <img src="https://img.shields.io/badge/VERSION-5.3%20BULLETPROOF%20CINEMA-FACC15?style=for-the-badge&logo=sparkles&logoColor=0B1120&labelColor=0F172A" alt="Version 5.3 Bulletproof Cinema" />
+    <img src="https://img.shields.io/badge/VERSION-6.4%20ZERO--REPEAT%20CINEMA-FACC15?style=for-the-badge&logo=sparkles&logoColor=0B1120&labelColor=0F172A" alt="Version 6.4 Zero-Repeat Cinema" />
   </a>
   <a href="https://github.com/gmakercodeby-arch/ai-documentary-video-studio-skill">
     <img src="https://img.shields.io/badge/OUTPUT-1080p%20%40%2060FPS%20CINEMA-06B6D4?style=for-the-badge&logo=ffmpeg&logoColor=FFFFFF&labelColor=0F172A" alt="1080p 60fps Cinema" />

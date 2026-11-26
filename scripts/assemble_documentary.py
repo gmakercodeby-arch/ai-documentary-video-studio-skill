@@ -124,6 +124,7 @@ def shot_cache_key(shot: dict, render_dur: float, fps: int, width: int, height: 
         "start": round(float(shot.get("start", 0.0)), 3),
         "motion": shot.get("motion", "zoom_in"),
         "callout": shot.get("callout") or "",
+        "callout_mtime": Path(shot["callout"]).stat().st_mtime if shot.get("callout") and Path(shot["callout"]).exists() else 0,
         "sfx": shot.get("sfx") or "",
         "crop_zoom": shot.get("crop_zoom"),
         "crop_watermark": bool(shot.get("crop_watermark", False)),
@@ -242,7 +243,38 @@ def build_clip(
         )
         keep_sfx = shot.get("keep_native_sfx", True) and has_audio_stream(src)
         sfx_fade_out_st = max(render_dur - 0.18, 0.0)
-        if keep_sfx:
+        if keep_sfx and sfx_expr:
+            af_native = (
+                f"volume=-16dB,aresample=44100,aformat=channel_layouts=stereo,"
+                f"apad=whole_dur={render_dur:.3f},atrim=0:{render_dur:.3f},"
+                f"afade=t=in:st=0:d=0.15,afade=t=out:st={sfx_fade_out_st:.3f}:d=0.18"
+            )
+            if callout:
+                cmd = [
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
+                    "-loop", "1", "-i", str(callout),
+                    "-f", "lavfi", "-i", sfx_expr,
+                    "-filter_complex", (
+                        f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v];"
+                        f"[0:a]{af_native}[na];[2:a]apad=whole_dur={render_dur:.3f}[sa];"
+                        f"[na][sa]amix=inputs=2:duration=first:normalize=0,atrim=0:{render_dur:.3f}[a]"
+                    ),
+                    "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
+                    *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
+                ]
+            else:
+                cmd = [
+                    "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
+                    "-f", "lavfi", "-i", sfx_expr,
+                    "-filter_complex", (
+                        f"[0:v]{vf}[v];"
+                        f"[0:a]{af_native}[na];[1:a]apad=whole_dur={render_dur:.3f}[sa];"
+                        f"[na][sa]amix=inputs=2:duration=first:normalize=0,atrim=0:{render_dur:.3f}[a]"
+                    ),
+                    "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
+                    *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
+                ]
+        elif keep_sfx:
             af = (
                 f"volume=-16dB,aresample=44100,aformat=channel_layouts=stereo,"
                 f"apad=whole_dur={render_dur:.3f},atrim=0:{render_dur:.3f},"
@@ -267,7 +299,7 @@ def build_clip(
                 cmd = [
                     "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
                     "-loop", "1", "-i", str(callout),
-                    "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                    "-f", "lavfi", "-i", audio_src,
                     "-filter_complex", f"[0:v]{vf}[bg];[bg][1:v]overlay=0:0:shortest=1,format={pix_fmt}[v];[2:a]apad=whole_dur={render_dur:.3f}[a]",
                     "-map", "[v]", "-map", "[a]", "-t", f"{render_dur:.3f}",
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
@@ -275,7 +307,7 @@ def build_clip(
             else:
                 cmd = [
                     "ffmpeg", "-y", "-ss", f"{ss:.3f}", "-i", str(src),
-                    "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                    "-f", "lavfi", "-i", audio_src,
                     "-map", "0:v", "-map", "1:a", "-t", f"{render_dur:.3f}", "-vf", vf,
                     "-af", f"apad=whole_dur={render_dur:.3f}",
                     *enc_args, "-r", str(fps), "-c:a", "pcm_s16le", str(out_clip),
@@ -440,6 +472,7 @@ def main():
     ap.add_argument("--workers", type=int, default=min(3, max(1, (os.cpu_count() or 4) // 2)), help="Parallel clip workers (default: 3)")
     ap.add_argument("--no-gpu", action="store_true", help="Force CPU libx264 encoding")
     ap.add_argument("--no-proxy", action="store_true", help="Skip Layer-2 QA proxy generation")
+    ap.add_argument("--tail-sec", type=float, default=2.5, help="Trailing fade tail after last spoken word (default: 2.5)")
     args = ap.parse_args()
 
     if args.no_gpu:
@@ -460,7 +493,7 @@ def main():
             spoken_end = float(seg_data["last_spoken_end"])
         elif seg_data.get("segments"):
             spoken_end = float(seg_data["segments"][-1]["end"])
-    target_total = round(spoken_end + 2.5, 3)
+    target_total = round(spoken_end + args.tail_sec, 3)
 
     plan_dur = sum(float(s["duration"]) for s in shots)
     if plan_dur < target_total:

@@ -1,12 +1,13 @@
 """
-AI Documentary Studio v4.0 — Pro Documentary Voiceover Generator
+GMZ Documentary Studio v3.0 — Pro Hindi Documentary Voiceover Generator
 - Locks ONE single TTS model (gemini-3.1-flash-tts-preview) across all acts with identical STYLE_HEADER
-  so voice tone NEVER shifts mid-video.
-- Splits each act into sentence-level chunks (~60-90 words, splitting ONLY at । / . / ? / !)
-  and stitches chunks with 150ms natural breath padding + 40ms acrossfade.
-- Keeps warm baritone EQ + gentle compression ONLY (NO premature loudnorm; single true two-pass
-  loudnorm runs ONLY once on the final mixed master in assemble_documentary.py).
-- Runs automatic post-TTS sanity checks per chunk & act (silence > 2.5s or abnormal WPM) and retries.
+  so voice tone NEVER shifts mid-video (no silent 2.5 <-> 3.1 fallback).
+- Splits each act into sentence-level chunks (~60-90 words, splitting ONLY at । / ? / !)
+  and stitches chunks with 150ms natural breath padding + 40ms acrossfade (no harsh 0.35s digital silence).
+- Removes loudnorm from per-act EQ and concat (keeps only warm baritone EQ + gentle compressor;
+  single two-pass loudnorm runs ONLY once on the final mixed master in assemble_documentary.py).
+- Runs automatic post-TTS sanity checks per chunk & act (detects internal silence > 2.5s or abnormal WPM/duration)
+  and automatically retries bad chunks.
 """
 
 import argparse
@@ -24,8 +25,8 @@ LOCKED_MODEL = "gemini-3.1-flash-tts-preview"
 DEFAULT_VOICE = "Fenrir"
 
 STYLE_HEADER = (
-    "Narrate this like a serious, deep-voiced YouTube documentary storyteller "
-    "(heavy, warm, chesty baritone male voice, natural conversational delivery). "
+    "Narrate this in Hindi like a serious, deep-voiced Indian YouTube documentary storyteller "
+    "(heavy, warm, chesty baritone male voice, authentic Indian Hindi accent). "
     "CRITICAL PACING RULE: Speak at a STEADY, measured documentary pace of ~155-162 words per minute — "
     "NEVER rush, NEVER speed up into breathless fast talking, and NEVER leave long dead pauses! "
     "Give natural 0.25-second breath pauses between sentences, build controlled urgency on key reveals, "
@@ -46,13 +47,13 @@ CINEMA_VOCAL_EQ = (
 def load_api_key(env_path: str | None = None) -> str:
     if os.environ.get("GEMINI_API_KEY"):
         return os.environ["GEMINI_API_KEY"].strip()
-    candidates = [Path(env_path)] if env_path else [Path.cwd() / ".env", Path.home() / ".env"]
+    candidates = [Path(env_path)] if env_path else [Path.cwd() / ".env", Path(r"f:\Daily Learn 3.0\.env")]
     for p in candidates:
         if p and p.exists():
             for line in p.read_text(encoding="utf-8").splitlines():
                 if line.strip().startswith("GEMINI_API_KEY="):
                     return line.split("=", 1)[1].strip().strip('"').strip("'")
-    raise RuntimeError("GEMINI_API_KEY not found in environment or .env file! Run scripts/check_setup.py.")
+    raise RuntimeError("GEMINI_API_KEY not found in environment or .env file!")
 
 
 def probe_duration(path: Path) -> float:
@@ -65,8 +66,8 @@ def probe_duration(path: Path) -> float:
 
 
 def split_sentence_chunks(text: str, min_words: int = 60, max_words: int = 90) -> list[str]:
-    """Split narration ONLY on sentence boundaries (। / . / ? / !) into ~60-90 word chunks."""
-    sentences = [s.strip() for s in re.split(r"(?<=[।.?!])\s+", text.strip()) if s.strip()]
+    """Split Hindi/Hinglish narration ONLY on sentence boundaries (। / ? / !) into ~60-90 word chunks."""
+    sentences = [s.strip() for s in re.split(r"(?<=[।?!])\s+", text.strip()) if s.strip()]
     chunks: list[str] = []
     cur: list[str] = []
     cur_words = 0
@@ -81,6 +82,7 @@ def split_sentence_chunks(text: str, min_words: int = 60, max_words: int = 90) -
             cur.append(sent)
             cur_words += sw
     if cur:
+        # Avoid tiny trailing orphan chunk (<25 words) by merging with previous if safe
         if chunks and cur_words < 25 and (len(chunks[-1].split()) + cur_words <= max_words + 20):
             chunks[-1] = chunks[-1] + " " + " ".join(cur)
         else:
@@ -125,7 +127,11 @@ def synth_chunk_locked(
     model: str,
     max_retries: int = 5,
 ) -> tuple[float, float, int, int]:
-    """Synthesize ONE chunk strictly with the locked model + exponential backoff & sanity retries."""
+    """
+    Synthesize ONE chunk strictly with the locked model.
+    Uses exponential backoff on 429/rate limits and retries on empty response or sanity failure.
+    Returns: (duration_sec, wpm, retries_used, rate_limit_429_hits)
+    """
     words = len(text.split())
     last_reason = "unknown"
     retries_used = 0
@@ -179,6 +185,7 @@ def synth_chunk_locked(
             retries_used += 1
             if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
                 hits_429 += 1
+                # Check if API gave a huge daily quota wait (>300s) vs short RPM wait
                 m_retry = re.search(r"retryDelay['\"]?:\s*['\"]?(\d+)s", err_str)
                 if m_retry and int(m_retry.group(1)) > 300:
                     raise RuntimeError(f"Daily quota exhausted on {model} (retry in {m_retry.group(1)}s): {last_reason}")
@@ -200,7 +207,10 @@ def stitch_audio_crossfade(
     xfade_sec: float = 0.04,
     apply_eq: bool = False,
 ):
-    """Stitch multiple WAV/MP3 files with subtle natural breath padding + 40ms acrossfade."""
+    """
+    Stitch multiple WAV/MP3 files with subtle natural breath padding + 40ms acrossfade.
+    ZERO harsh digital silence gaps and ZERO loudnorm pumping!
+    """
     if len(input_files) == 1:
         af = CINEMA_VOCAL_EQ if apply_eq else "aresample=44100,aformat=channel_layouts=mono"
         subprocess.run(
@@ -215,6 +225,7 @@ def stitch_audio_crossfade(
     for i, f in enumerate(input_files):
         ff_inputs += ["-i", str(f)]
         base_chain = CINEMA_VOCAL_EQ if apply_eq else "aresample=44100,aformat=channel_layouts=mono"
+        # Add subtle natural breath pad to the end of each clip except the final one
         if i < n - 1 and pad_sec > 0:
             filters.append(f"[{i}:a]{base_chain},apad=pad_dur={pad_sec:.3f}[s{i}];")
         else:
@@ -237,7 +248,7 @@ def stitch_audio_crossfade(
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Batch generate consistent documentary voiceover (single locked TTS model).")
+    ap = argparse.ArgumentParser(description="Batch generate consistent Hindi documentary voiceover (single locked TTS model).")
     ap.add_argument("--acts-json", required=True, help="JSON file: [{'id': 'act_01', 'title': '...', 'text': '...'}]")
     ap.add_argument("--out-dir", required=True, help="Output directory for act mp3s & master_narration.mp3")
     ap.add_argument("--voice", default=DEFAULT_VOICE, help="Gemini TTS voice name (default: Fenrir)")
@@ -329,6 +340,7 @@ def main():
         act_files.append(master_mp3)
         print(f"  -> {act_id}: {dur:.2f}s ({wpm} WPM, max_sil={max_sil}s)")
 
+    # Stitch all acts with subtle 220ms breath + 40ms acrossfade (NO loudnorm here!)
     master_out = out_dir / "master_narration.mp3"
     stitch_audio_crossfade(act_files, master_out, pad_sec=act_pad_sec, xfade_sec=act_xfade_sec, apply_eq=False)
     total_dur = probe_duration(master_out)

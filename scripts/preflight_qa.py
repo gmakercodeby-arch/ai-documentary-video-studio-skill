@@ -175,19 +175,33 @@ def check_script_vs_whisper(acts_json: Path, segs_json: Path) -> dict:
     }
 
 
-def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4, xfade: float = 0.25) -> dict:
+def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_still_reuse: int = 1, xfade: float = 0.25) -> dict:
     missing = [s["path"] for s in shots if not Path(s["path"]).exists()]
     recent: deque[str] = deque(maxlen=cooldown)
     cooldown_violations = []
     counts = Counter()
+    still_counts = Counter()
+    video_slices: dict[str, list[tuple[int, float, float]]] = {}
+    video_slice_overlaps = []
     video_dur_cache: dict[str, float] = {}
     video_eof_overflows = []
     static_diagram_shots = []
+    video_ext = {".mp4", ".mov", ".mkv", ".webm"}
+    video_dur_total = 0.0
+    video_shot_count = 0
 
     for i, s in enumerate(shots):
         p = s["path"]
         p_obj = Path(p)
         counts[p_obj.name] += 1
+        is_vid = p_obj.suffix.lower() in video_ext
+        dur = float(s["duration"])
+        if is_vid:
+            video_dur_total += dur
+            video_shot_count += 1
+        else:
+            still_counts[p_obj.name] += 1
+
         if p in recent:
             cooldown_violations.append({"shot_idx": i + 1, "beat_start": s.get("beat_start"), "file": p_obj.name})
         recent.append(p)
@@ -197,8 +211,8 @@ def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4
         if "/diagrams/" in lower_p or "/slides/" in lower_p:
             static_diagram_shots.append({"shot_idx": i + 1, "beat_start": s.get("beat_start"), "file": p_obj.name})
 
-        # v5.3 Gate: Video clip EOF bounds check (start + duration + xfade_handle <= actual clip duration)
-        if p_obj.suffix.lower() in {".mp4", ".mov", ".mkv", ".webm"} and p_obj.exists():
+        # v5.3/v6.0 Gate: Video clip EOF bounds + zero sub-beat slice overlap check
+        if is_vid and p_obj.exists():
             if p not in video_dur_cache:
                 try:
                     out = subprocess.check_output(
@@ -211,7 +225,8 @@ def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4
                     video_dur_cache[p] = 0.0
             real_dur = video_dur_cache[p]
             ss = float(s.get("start", 0.0))
-            need_end = ss + float(s["duration"]) + (xfade if i < len(shots) - 1 else 0.0)
+            ee = ss + dur
+            need_end = ee + (xfade if i < len(shots) - 1 else 0.0)
             if real_dur > 0 and need_end > (real_dur - 0.05):
                 video_eof_overflows.append({
                     "shot_idx": i + 1,
@@ -221,19 +236,37 @@ def validate_shot_plan(shots: list[dict], cooldown: int = 12, max_reuse: int = 4
                     "needed_end": round(need_end, 2),
                     "clip_dur": round(real_dur, 2),
                 })
+            for prev_idx, ps, pe in video_slices.get(p, []):
+                ov = min(ee, pe) - max(ss, ps)
+                if ov > 0.50:
+                    video_slice_overlaps.append({
+                        "shot_idx": i + 1,
+                        "prev_shot_idx": prev_idx,
+                        "file": p_obj.name,
+                        "prev_range": [round(ps, 2), round(pe, 2)],
+                        "cur_range": [round(ss, 2), round(ee, 2)],
+                        "overlap_sec": round(ov, 2),
+                    })
+            video_slices.setdefault(p, []).append((i + 1, ss, ee))
 
     unique_count = len(counts)
     total_cuts = len(shots)
+    total_dur = sum(float(s["duration"]) for s in shots)
     avg_reuse = round(total_cuts / max(unique_count, 1), 2)
-    overused = [{"file": name, "uses": cnt} for name, cnt in counts.most_common() if cnt > max_reuse]
+    video_pct = round((video_dur_total / max(total_dur, 0.01)) * 100.0, 1)
+    overused_stills = [{"file": name, "uses": cnt} for name, cnt in still_counts.most_common() if cnt > max_still_reuse]
     return {
         "total_cuts": total_cuts,
         "unique_assets": unique_count,
+        "video_shots": video_shot_count,
+        "still_shots": total_cuts - video_shot_count,
+        "video_motion_pct": video_pct,
         "avg_reuse_ratio": avg_reuse,
-        "max_reuse_limit": max_reuse,
-        "overused_assets": overused,
+        "max_still_reuse_limit": max_still_reuse,
+        "overused_stills": overused_stills,
+        "video_slice_overlaps": video_slice_overlaps,
         "top_10_reused_assets": [{"file": n, "uses": c} for n, c in counts.most_common(10)],
-        "total_duration_sec": round(sum(float(s["duration"]) for s in shots), 2),
+        "total_duration_sec": round(total_dur, 2),
         "missing_files": missing,
         "cooldown_window": cooldown,
         "cooldown_violations_count": len(cooldown_violations),
@@ -318,9 +351,10 @@ def main():
     ap.add_argument("--segments", required=True, help="segments.json path")
     ap.add_argument("--plan", required=True, help="shot_plan.json path")
     ap.add_argument("--out-dir", required=True, help="Output folder for QA grids & preflight_report.json")
-    ap.add_argument("--cooldown", type=int, default=12, help="Min shots before an asset can reappear (v4.0 default: 12)")
-    ap.add_argument("--max-reuse", type=int, default=4, help="Hard cap on max times any single asset can appear in full video (v4.0 default: 4)")
-    ap.add_argument("--min-unique", type=int, default=55, help="Min unique visual assets required for long-form (>600s) documentaries (v4.0 default: 55)")
+    ap.add_argument("--cooldown", type=int, default=12, help="Min shots before a source clip can reappear (v6.0 default: 12)")
+    ap.add_argument("--max-still-reuse", type=int, default=1, help="Hard cap on max times any still image can appear in full video (v6.0 default: 1)")
+    ap.add_argument("--min-video-pct", type=float, default=70.0, help="Min %% of runtime using .mp4 video / motion graphics vs static JPGs (v6.0 default: 70.0)")
+    ap.add_argument("--min-unique", type=int, default=120, help="Min unique visual assets required for long-form (>600s) documentaries (v6.0 default: 120)")
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -334,7 +368,7 @@ def main():
 
     silences = check_audio_silences(Path(args.audio), max_allowed=2.5)
     diff = check_script_vs_whisper(Path(args.acts), Path(args.segments))
-    plan_check = validate_shot_plan(shots, cooldown=args.cooldown, max_reuse=args.max_reuse)
+    plan_check = validate_shot_plan(shots, cooldown=args.cooldown, max_still_reuse=args.max_still_reuse)
     voice_check = check_voice_consistency(Path(args.audio).parent)
 
     failures = []
@@ -351,9 +385,13 @@ def main():
     if plan_check["cooldown_violations_count"] > 0:
         failures.append(f"Asset repeat cooldown violations (<{args.cooldown} shots): {plan_check['cooldown_violations_count']}")
     if plan_check["total_duration_sec"] >= 600 and plan_check["unique_assets"] < args.min_unique:
-        failures.append(f"Low visual diversity: only {plan_check['unique_assets']} unique assets for {plan_check['total_duration_sec']}s video (v4.0 min={args.min_unique})")
-    if plan_check["overused_assets"]:
-        failures.append(f"Visual repetition cap exceeded (>{args.max_reuse} uses): {plan_check['overused_assets'][:6]}")
+        failures.append(f"Low visual diversity: only {plan_check['unique_assets']} unique assets for {plan_check['total_duration_sec']}s video (v6.0 min={args.min_unique})")
+    if plan_check["overused_stills"]:
+        failures.append(f"Still-image repetition cap exceeded (>{args.max_still_reuse} uses): {plan_check['overused_stills'][:6]}")
+    if plan_check["video_slice_overlaps"]:
+        failures.append(f"Repeated video sub-beat slices (>0.5s overlap): {plan_check['video_slice_overlaps'][:6]}")
+    if plan_check["video_motion_pct"] < args.min_video_pct:
+        failures.append(f"Too many static Ken Burns JPGs: only {plan_check['video_motion_pct']}% video/motion (v6.0 min={args.min_video_pct}%)")
     if plan_check.get("video_eof_overflows"):
         failures.append(f"Video clip EOF overflow (start+duration+xfade > real clip length — causes black screens!): {plan_check['video_eof_overflows'][:6]}")
     if plan_check.get("static_diagram_shots"):

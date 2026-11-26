@@ -1,7 +1,7 @@
 """
-AI Documentary Studio v4.0 — 16:9 3D Cutaway, Literal Object & Thumbnail Art Generator
+Daily Learn 3.0 Style — 16:9 3D Cutaway, Metaphor & Thumbnail Art Generator
 Uses nano-banana-pro-preview (fallback: gemini-3.1-flash-image) via Google AI Studio key.
-Generates crisp, text-free 16:9 photorealistic 3D engineering cutaways and literal object visuals.
+Generates crisp, text-free 16:9 photorealistic 3D engineering cutaways and visual metaphors.
 """
 
 import argparse
@@ -19,13 +19,13 @@ FALLBACK_IMG_MODEL = "gemini-3.1-flash-image"
 def load_api_key(env_path: str | None = None) -> str:
     if os.environ.get("GEMINI_API_KEY"):
         return os.environ["GEMINI_API_KEY"].strip()
-    candidates = [Path(env_path)] if env_path else [Path.cwd() / ".env", Path.home() / ".env"]
+    candidates = [Path(env_path)] if env_path else [Path.cwd() / ".env", Path(r"f:\Daily Learn 3.0\.env")]
     for p in candidates:
         if p and p.exists():
             for line in p.read_text(encoding="utf-8").splitlines():
                 if line.strip().startswith("GEMINI_API_KEY="):
                     return line.split("=", 1)[1].strip().strip('"').strip("'")
-    raise RuntimeError("GEMINI_API_KEY not found in environment or .env file! Run scripts/check_setup.py.")
+    raise RuntimeError("GEMINI_API_KEY not found in environment or .env file!")
 
 
 def generate_one(client: genai.Client, prompt: str, out_path: Path):
@@ -52,7 +52,7 @@ def generate_one(client: genai.Client, prompt: str, out_path: Path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Batch generate 16:9 AI cutaway & literal object visuals.")
+    ap = argparse.ArgumentParser(description="Batch generate 16:9 AI cutaway & metaphor visuals.")
     ap.add_argument("--prompts-json", required=True, help="JSON list: [{'id': 'shot_01', 'prompt': '...'}]")
     ap.add_argument("--out-dir", required=True, help="Output folder for generated PNGs")
     ap.add_argument("--delay", type=float, default=4.0, help="Delay between requests (seconds)")

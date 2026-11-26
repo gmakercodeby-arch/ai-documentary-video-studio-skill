@@ -1,7 +1,7 @@
 """
-AI Documentary Studio v4.0 — Forced Audio-to-Visual Sentence Alignment Engine
+GMZ Documentary Studio v3.0 — Forced Audio-to-Visual Sentence Alignment Engine
 Runs local faster-whisper on master_narration.mp3 with vad_filter=False & word_timestamps=True
-so quiet syllables and ending lines are NEVER dropped from segments.json.
+so quiet Hindi syllables and ending lines are NEVER dropped from segments.json.
 """
 
 import argparse
@@ -11,11 +11,11 @@ from faster_whisper import WhisperModel
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Extract exact sentence & word timestamps from narration audio.")
+    ap = argparse.ArgumentParser(description="Extract exact Hindi/English sentence & word timestamps from narration audio.")
     ap.add_argument("--audio", required=True, help="Path to master_narration.mp3 or act mp3")
     ap.add_argument("--out", required=True, help="Output JSON path for timestamped segments")
     ap.add_argument("--model", default="small", help="Whisper model size (tiny, base, small, medium)")
-    ap.add_argument("--language", default="hi", help="Language code (default: hi; use en for English)")
+    ap.add_argument("--language", default="hi", help="Language code (default: hi)")
     args = ap.parse_args()
 
     print(f"Loading faster-whisper ({args.model}) on CPU (vad_filter=False, word_timestamps=True)...")
